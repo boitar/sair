@@ -1,0 +1,559 @@
+/**
+ * SAIR (Siri-ously AI Router)
+ * Universal Surge Adapter Script for Apple Intelligence (iOS 27.3+)
+ * 
+ * Repository: https://github.com/boitar/sair
+ * License: MIT
+ */
+
+// =========================================================================
+// 1. Configuration & Argument Parsing
+// =========================================================================
+
+function getConfiguration() {
+  const defaults = {
+    endpoint: "https://api.openai.com/v1/chat/completions",
+    api_key: "",
+    model: "gpt-4o-mini",
+    notify: "error",         // "all" | "error" (or "none")
+    fallback: true,          // true: pass through to official Qwen on error/timeout; false: block
+    timeout_writing: 15,     // seconds for Writing Tools
+    timeout_siri: 7,         // seconds for Siri QA (Siri client times out around 6~8s)
+    timeout_vision: 10,      // seconds for Visual Intelligence
+    reasoning_effort: "low", // for reasoning-capable models (e.g. Gemini / o-series)
+    max_tokens: 400
+  };
+
+  // Parse Surge module arguments: argument="key1=val1&key2=val2"
+  if (typeof $argument === "string" && $argument.trim()) {
+    const pairs = $argument.split("&");
+    for (const pair of pairs) {
+      const [rawKey, ...valParts] = pair.split("=");
+      if (!rawKey) continue;
+      const key = rawKey.trim();
+      const val = decodeURIComponent(valParts.join("=").trim());
+      if (key === "endpoint" && val) defaults.endpoint = val;
+      if (key === "api_key" && val) defaults.api_key = val;
+      if (key === "model" && val) defaults.model = val;
+      if (key === "notify" && val) defaults.notify = val.toLowerCase();
+      if (key === "fallback") defaults.fallback = val === "true" || val === "1";
+      if (key === "timeout_writing" && val) defaults.timeout_writing = parseInt(val, 10) || 15;
+      if (key === "timeout_siri" && val) defaults.timeout_siri = parseInt(val, 10) || 7;
+      if (key === "timeout_vision" && val) defaults.timeout_vision = parseInt(val, 10) || 10;
+    }
+  }
+
+  // PersistentStore overrides (if set via custom UI or script)
+  if (typeof $persistentStore !== "undefined") {
+    const psEndpoint = $persistentStore.read("SAIR_ENDPOINT");
+    if (psEndpoint) defaults.endpoint = psEndpoint;
+    const psKey = $persistentStore.read("SAIR_API_KEY");
+    if (psKey) defaults.api_key = psKey;
+    const psModel = $persistentStore.read("SAIR_MODEL");
+    if (psModel) defaults.model = psModel;
+    const psNotify = $persistentStore.read("SAIR_NOTIFY");
+    if (psNotify) defaults.notify = psNotify.toLowerCase();
+    const psFallback = $persistentStore.read("SAIR_FALLBACK");
+    if (psFallback !== null && psFallback !== undefined) defaults.fallback = psFallback === "true" || psFallback === "1";
+  }
+
+  // Normalize endpoint URL: ensure /chat/completions is present if only base URL provided
+  if (defaults.endpoint.endsWith("/v1") || defaults.endpoint.endsWith("/v1/")) {
+    defaults.endpoint = defaults.endpoint.replace(/\/+$/, "") + "/chat/completions";
+  }
+
+  return defaults;
+}
+
+function notify(config, title, subtitle, message, isError = false) {
+  if (config.notify === "none") return;
+  if (config.notify === "all" || (config.notify === "error" && isError)) {
+    $notification.post(title, subtitle, message);
+  }
+}
+
+// =========================================================================
+// 2. Utility: Built-in Inspector & Model Discovery Endpoint
+// =========================================================================
+
+function handleInspectorRoute(url, config) {
+  // Route: /sair/models -> fetch models from configured provider
+  if (url.includes("/sair/models")) {
+    const modelsUrl = config.endpoint.replace(/\/chat\/completions\/?$/, "/models");
+    $httpClient.get({
+      url: modelsUrl,
+      headers: {
+        "Authorization": config.api_key ? "Bearer " + config.api_key : "",
+        "Content-Type": "application/json"
+      },
+      timeout: 10
+    }, function(err, resp, data) {
+      if (err || !data) {
+        $done({
+          response: {
+            status: 502,
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err) })
+          }
+        });
+        return;
+      }
+      $done({
+        response: {
+          status: 200,
+          headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+          body: data
+        }
+      });
+    });
+    return true;
+  }
+
+  // Route: /sair/config or /sair/status -> inspect active configuration
+  if (url.includes("/sair/config") || url.includes("/sair/status")) {
+    const safeConfig = Object.assign({}, config, {
+      api_key: config.api_key ? (config.api_key.slice(0, 4) + "••••••••" + config.api_key.slice(-4)) : "(none)"
+    });
+    $done({
+      response: {
+        status: 200,
+        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({
+          project: "SAIR (Siri-ously AI Router)",
+          version: "1.0.0",
+          active_configuration: safeConfig,
+          timestamp: new Date().toISOString()
+        }, null, 2)
+      }
+    });
+    return true;
+  }
+
+  return false;
+}
+
+// =========================================================================
+// 3. Request Extraction: Prompt & Multimodal Image Detection
+// =========================================================================
+
+function extractPromptAndImage(reqBody) {
+  let prompt = "";
+  let imageUrl = "";
+  let scenario = "general"; // "writing", "siri", "vision"
+
+  if (!reqBody) return { prompt, imageUrl, scenario };
+
+  try {
+    const data = typeof reqBody === "string" ? JSON.parse(reqBody) : reqBody;
+
+    // Scenario inference from configuration group ID
+    const groupId = (data.configuration && data.configuration.response_configuration_group_id) || "";
+    if (groupId.includes("visualIntelligence") || groupId.includes("Camera")) {
+      scenario = "vision";
+    } else if (groupId.includes("compose") || groupId.includes("selectedAndAllText")) {
+      scenario = "writing";
+    } else if (groupId.includes("siri") || groupId.includes("tqa")) {
+      scenario = "siri";
+    }
+
+    // Recursive image detector
+    function findImage(obj) {
+      if (!obj) return "";
+      if (typeof obj === "string") {
+        if (obj.startsWith("data:image/")) return obj;
+        if (/^https?:\/\/.+\.(png|jpe?g|webp|gif)/i.test(obj)) return obj;
+        return "";
+      }
+      if (Array.isArray(obj)) {
+        for (const item of obj) {
+          const res = findImage(item);
+          if (res) return res;
+        }
+        return "";
+      }
+      if (typeof obj === "object") {
+        if (obj.image_url) {
+          const u = typeof obj.image_url === "string" ? obj.image_url : obj.image_url.url;
+          if (u) return u;
+        }
+        if (obj.input_image) {
+          const u = typeof obj.input_image === "string" ? obj.input_image : (obj.input_image.url || obj.input_image.image_url);
+          if (u) return u;
+        }
+        if (obj.image && typeof obj.image === "string") {
+          return obj.image.startsWith("data:") ? obj.image : "data:image/jpeg;base64," + obj.image;
+        }
+        if (obj.data && typeof obj.data === "string" && (obj.data.startsWith("data:") || obj.mime_type)) {
+          return obj.data.startsWith("data:") ? obj.data : `data:${obj.mime_type || "image/jpeg"};base64,${obj.data}`;
+        }
+        for (const k of Object.keys(obj)) {
+          if (k === "client_tools" || k === "server_tools") continue;
+          const res = findImage(obj[k]);
+          if (res) return res;
+        }
+      }
+      return "";
+    }
+
+    // Text prompt extraction
+    if (Array.isArray(data.input)) {
+      const texts = [];
+      for (const item of data.input) {
+        if (!item) continue;
+        const msg = item.message || item;
+        const content = msg.content;
+        if (typeof content === "string" && content.trim()) {
+          texts.push(content.trim());
+        } else if (Array.isArray(content)) {
+          for (const c of content) {
+            if (typeof c === "string" && c.trim()) {
+              texts.push(c.trim());
+            } else if (c && typeof c === "object") {
+              const t = c.text || c.input_text || c.value || "";
+              if (t && typeof t === "string" && t.trim()) {
+                texts.push(t.trim());
+              }
+            }
+          }
+        }
+      }
+      if (texts.length > 0) prompt = texts.join("\n\n");
+    }
+
+    imageUrl = findImage(data);
+    if (imageUrl && scenario === "general") scenario = "vision";
+  } catch (e) {
+    const imgMatch = String(reqBody).match(/"(data:image\/[^"]+)"/);
+    if (imgMatch) {
+      imageUrl = imgMatch[1];
+      scenario = "vision";
+    }
+  }
+
+  // Fallback regex text match
+  if (!prompt) {
+    const matches = [...String(reqBody).matchAll(/"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g)];
+    if (matches.length > 0) {
+      try {
+        prompt = matches.map(m => JSON.parse("\"" + m[1] + "\"")).join("\n\n");
+      } catch (e) {
+        prompt = matches.map(m => m[1]).join("\n\n");
+      }
+    }
+  }
+
+  return { prompt: prompt.trim(), imageUrl, scenario };
+}
+
+// =========================================================================
+// 4. Response SSE Rewriter & Schema Adaptive Formatter
+// =========================================================================
+
+function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
+  const isWritingTools = scenario === "writing" || originalSseBody.includes('"body":') || originalSseBody.includes('\\"body\\"');
+  const isSiri = scenario === "siri" || scenario === "vision" || originalSseBody.includes('"content":') || originalSseBody.includes('\\"content\\"');
+
+  let payloadString;
+  if (isWritingTools) {
+    // Writing Tools Schema: body + refinements
+    let finalBody = replyText;
+    let finalRefinements = [
+      "增加更多细节描写与生动修辞",
+      "优化语言节奏与整体结构",
+      "精炼文本使其更具表现力"
+    ];
+
+    try {
+      const cleanJson = replyText.replace(/```json\s*/gi, "").replace(/```\s*$/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && typeof parsed.body === "string") {
+        finalBody = parsed.body;
+        if (Array.isArray(parsed.refinements) && parsed.refinements.length > 0) {
+          finalRefinements = parsed.refinements.map(String);
+        }
+      }
+    } catch (e) {
+      finalBody = replyText;
+    }
+
+    payloadString = JSON.stringify({
+      body: finalBody.trim(),
+      refinements: finalRefinements
+    });
+  } else if (isSiri) {
+    // Siri QA & Visual Intelligence Schema: content + suggestions + summary
+    let finalContent = replyText;
+    let finalSuggestions = [
+      "了解更多相关信息",
+      "深入探讨",
+      "相关背景推荐"
+    ];
+    let finalSummary = (userPrompt || (scenario === "vision" ? "视觉认知分析" : "智能问答")).slice(0, 20).trim();
+
+    const summaryMatch = originalSseBody.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (summaryMatch) {
+      try {
+        finalSummary = JSON.parse("\"" + summaryMatch[1] + "\"");
+      } catch (e) {
+        finalSummary = summaryMatch[1];
+      }
+    }
+
+    try {
+      const cleanJson = replyText.replace(/```json\s*/gi, "").replace(/```\s*$/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && typeof parsed.content === "string") {
+        finalContent = parsed.content;
+        if (Array.isArray(parsed.suggestions) && parsed.suggestions.length > 0) {
+          finalSuggestions = parsed.suggestions.map(String);
+        }
+        if (typeof parsed.summary === "string" && parsed.summary) {
+          finalSummary = parsed.summary;
+        }
+      }
+    } catch (e) {
+      finalContent = replyText;
+    }
+
+    payloadString = JSON.stringify({
+      content: finalContent.trim(),
+      suggestions: finalSuggestions,
+      summary: finalSummary
+    });
+  } else {
+    payloadString = replyText.trim();
+  }
+
+  const lines = originalSseBody.split("\n");
+  const newLines = [];
+  let firstDeltaReplaced = false;
+
+  const kDelta = "session.response.choices[].items[].message.content[].text.value.delta";
+  const kDone = "session.response.choices[].items[].message.content[].text.value.done";
+  const kContentDone = "session.response.choices[].items[].message.content[].done";
+  const kItemsDone = "session.response.choices[].items[].done";
+  const kChoicesCompleted = "session.response.choices[].completed";
+  const kChoicesDone = "session.response.choices[].done";
+  const kSessionDone = "session.response.done";
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith("data:") && line.includes("{")) {
+      try {
+        const jsonStr = line.slice(5).trim();
+        const obj = JSON.parse(jsonStr);
+
+        if (obj[kDelta]) {
+          if (!firstDeltaReplaced) {
+            obj[kDelta].delta = payloadString;
+            firstDeltaReplaced = true;
+          } else {
+            obj[kDelta].delta = "";
+          }
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kDone] && typeof obj[kDone].value !== "undefined") {
+          obj[kDone].value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kContentDone] && obj[kContentDone].content && obj[kContentDone].content.text) {
+          obj[kContentDone].content.text.value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kItemsDone] && obj[kItemsDone].item && obj[kItemsDone].item.message && Array.isArray(obj[kItemsDone].item.message.content) && obj[kItemsDone].item.message.content[0] && obj[kItemsDone].item.message.content[0].text) {
+          obj[kItemsDone].item.message.content[0].text.value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kChoicesCompleted] && obj[kChoicesCompleted].choice && Array.isArray(obj[kChoicesCompleted].choice.output) && obj[kChoicesCompleted].choice.output[0] && obj[kChoicesCompleted].choice.output[0].message && Array.isArray(obj[kChoicesCompleted].choice.output[0].message.content) && obj[kChoicesCompleted].choice.output[0].message.content[0].text) {
+          obj[kChoicesCompleted].choice.output[0].message.content[0].text.value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kChoicesDone] && obj[kChoicesDone].choice && Array.isArray(obj[kChoicesDone].choice.output) && obj[kChoicesDone].choice.output[0] && obj[kChoicesDone].choice.output[0].message && Array.isArray(obj[kChoicesDone].choice.output[0].message.content) && obj[kChoicesDone].choice.output[0].message.content[0].text) {
+          obj[kChoicesDone].choice.output[0].message.content[0].text.value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+
+        if (obj[kSessionDone] && Array.isArray(obj[kSessionDone].choices) && obj[kSessionDone].choices[0] && Array.isArray(obj[kSessionDone].choices[0].output) && obj[kSessionDone].choices[0].output[0] && obj[kSessionDone].choices[0].output[0].message && Array.isArray(obj[kSessionDone].choices[0].output[0].message.content) && obj[kSessionDone].choices[0].output[0].message.content[0].text) {
+          obj[kSessionDone].choices[0].output[0].message.content[0].text.value = payloadString;
+          newLines.push("data: " + JSON.stringify(obj));
+          continue;
+        }
+      } catch (e) {}
+    }
+    newLines.push(line);
+  }
+  return newLines.join("\n");
+}
+
+// =========================================================================
+// 5. Main Execution Flow
+// =========================================================================
+
+(function main() {
+  const config = getConfiguration();
+  const reqUrl = (typeof $request !== "undefined" && $request.url) ? $request.url : "";
+
+  // Check if this is an inspector / helper endpoint request
+  if (handleInspectorRoute(reqUrl, config)) {
+    return;
+  }
+
+  const isRequest = typeof $response === "undefined";
+
+  // -----------------------------------------------------------------------
+  // Phase 1: HTTP-REQUEST (Capture Prompt / Image & Cache)
+  // -----------------------------------------------------------------------
+  if (isRequest) {
+    const reqBody = (typeof $request !== "undefined" && $request.body) ? $request.body : "";
+    const { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
+
+    if (prompt || imageUrl) {
+      $persistentStore.write(prompt, "SAIR_LATEST_PROMPT");
+      $persistentStore.write(scenario, "SAIR_LATEST_SCENARIO");
+      if (imageUrl && imageUrl.length < 500000) {
+        $persistentStore.write(imageUrl, "SAIR_LATEST_IMAGE");
+      }
+      $persistentStore.write(String(Date.now()), "SAIR_LATEST_TIME");
+
+      const label = scenario === "vision" ? "[视觉智能]" : (scenario === "writing" ? "[写作工具]" : "[Siri问答]");
+      notify(config, "SAIR 拦截成功", label, (prompt || (imageUrl ? "图像输入" : "")).slice(0, 40), false);
+    } else {
+      notify(config, "SAIR 请求提示", "未解析到有效 Prompt 或图像", (reqBody || "空请求体").slice(0, 40), false);
+    }
+
+    $done({});
+    return;
+  }
+
+  // -----------------------------------------------------------------------
+  // Phase 2: HTTP-RESPONSE (Intercept Qwen Response & Route to Custom LLM)
+  // -----------------------------------------------------------------------
+  const realBody = $response.body || "";
+  const reqBody = (typeof $request !== "undefined" && $request.body) ? $request.body : "";
+
+  // Resolve prompt, image, and scenario
+  let { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
+  if (!prompt && !imageUrl) {
+    const cachedPrompt = $persistentStore.read("SAIR_LATEST_PROMPT") || "";
+    const cachedImage = $persistentStore.read("SAIR_LATEST_IMAGE") || "";
+    const cachedScenario = $persistentStore.read("SAIR_LATEST_SCENARIO") || "general";
+    const promptTime = Number($persistentStore.read("SAIR_LATEST_TIME") || 0);
+    if (Date.now() - promptTime < 60000) {
+      prompt = cachedPrompt;
+      imageUrl = cachedImage;
+      scenario = cachedScenario;
+    }
+  }
+
+  // Adaptive Timeout calculation based on scenario
+  let targetTimeout = config.timeout_siri;
+  if (scenario === "writing") targetTimeout = config.timeout_writing;
+  else if (scenario === "vision" || imageUrl) targetTimeout = config.timeout_vision;
+
+  let finished = false;
+  function finishWith(body, isError = false, errMsg = "") {
+    if (!finished) {
+      finished = true;
+      if (body) {
+        $done({ body: body });
+      } else {
+        // Fallback decision
+        if (config.fallback) {
+          if (isError) {
+            notify(config, "SAIR 触发官方回退", errMsg || "请求失败或超时", "已自动放行官方千问回包", true);
+          }
+          $done({});
+        } else {
+          notify(config, "SAIR 请求异常", errMsg || "自定义模型调用失败", "已按配置阻断请求 (未回退官方)", true);
+          $done({ response: { status: 504, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: errMsg || "Custom model gateway timeout/failure" }) } });
+        }
+      }
+    }
+  }
+
+  // Failsafe timeout timer
+  setTimeout(() => {
+    finishWith(null, true, `网关超时 (${targetTimeout}s)`);
+  }, (targetTimeout + 1) * 1000);
+
+  if (!prompt && !imageUrl) {
+    finishWith(null, true, "未能定位有效 Prompt 或图片载荷");
+    return;
+  }
+
+  notify(config, "SAIR 正在转接", `模型: ${config.model}`, (prompt || "图像理解").slice(0, 30), false);
+
+  // Build Multimodal or Text Messages
+  let userContent;
+  if (imageUrl) {
+    userContent = [
+      { type: "text", text: prompt || "请识别并详细分析图中内容，简明扼要地回答。" },
+      { type: "image_url", image_url: { url: imageUrl } }
+    ];
+  } else {
+    userContent = prompt;
+  }
+
+  const systemPrompt = imageUrl
+    ? "你是由 Apple 智能 Siri 调用的视觉认知助手。请精准、简洁、口语化地识别图片并回答提问，重点突出，切勿多余开场白或客套话。"
+    : "你是由 Apple 智能 Siri 调用的千问助手。请直接、高质量、口语化地回答用户指令，重点突出，切勿输出多余开场白或客套话。";
+
+  const reqHeaders = { "Content-Type": "application/json" };
+  if (config.api_key) {
+    reqHeaders["Authorization"] = "Bearer " + config.api_key;
+  }
+
+  $httpClient.post({
+    url: config.endpoint,
+    headers: reqHeaders,
+    body: JSON.stringify({
+      model: config.model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent }
+      ],
+      reasoning_effort: config.reasoning_effort,
+      max_tokens: config.max_tokens,
+      temperature: 0.7
+    }),
+    timeout: targetTimeout
+  }, function(error, response, data) {
+    if (error || !data) {
+      finishWith(null, true, `上游网关连接失败: ${error || "空响应"}`);
+      return;
+    }
+
+    try {
+      const resObj = JSON.parse(data);
+      if (resObj.error) {
+        finishWith(null, true, `模型返回错误: ${resObj.error.message || JSON.stringify(resObj.error)}`);
+        return;
+      }
+
+      let replyText = "";
+      if (resObj.choices && resObj.choices[0] && resObj.choices[0].message) {
+        replyText = resObj.choices[0].message.content;
+      } else {
+        replyText = typeof data === "string" ? data : JSON.stringify(resObj);
+      }
+
+      notify(config, "SAIR 生成完成", `模型: ${config.model}`, replyText.slice(0, 40) + "...", false);
+
+      const modifiedBody = replaceStreamText(realBody, replyText, prompt, scenario);
+      finishWith(modifiedBody);
+    } catch (e) {
+      finishWith(null, true, `回包结构注入异常: ${String(e)}`);
+    }
+  });
+})();
