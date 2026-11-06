@@ -1,6 +1,6 @@
 /**
  * SAIR (Siri-ously AI Router)
- * Universal Surge Adapter Script for Apple Intelligence (iOS 27.3+)
+ * Universal Surge / Loon Adapter Script for Apple Intelligence (iOS 27.3+)
  * 
  * Repository: https://github.com/boitar/sair
  * License: MIT
@@ -9,6 +9,66 @@
 // =========================================================================
 // 1. Configuration & Argument Parsing
 // =========================================================================
+
+function getArgumentMap() {
+  if (typeof $argument === "undefined" || $argument === null) return {};
+
+  // Loon exposes plugin [Argument] values as an object, while Surge module
+  // arguments arrive as a URL-style query string.
+  if (typeof $argument === "object") return $argument;
+  if (typeof $argument !== "string" || !$argument.trim()) return {};
+
+  const result = {};
+  for (const pair of $argument.split("&")) {
+    const [rawKey, ...valueParts] = pair.split("=");
+    if (!rawKey) continue;
+    const key = rawKey.trim();
+    if (!key) continue;
+    const rawValue = valueParts.join("=").trim();
+    try {
+      result[key] = decodeURIComponent(rawValue);
+    } catch (e) {
+      result[key] = rawValue;
+    }
+  }
+  return result;
+}
+
+function readPersistent(key) {
+  if (typeof $persistentStore === "undefined" || !$persistentStore || typeof $persistentStore.read !== "function") {
+    return null;
+  }
+  try {
+    return $persistentStore.read(key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function writePersistent(value, key) {
+  if (typeof $persistentStore === "undefined" || !$persistentStore || typeof $persistentStore.write !== "function") {
+    return false;
+  }
+  try {
+    return $persistentStore.write(String(value), key);
+  } catch (e) {
+    return false;
+  }
+}
+
+function isResponsePhase() {
+  return typeof $response !== "undefined" && $response !== null;
+}
+
+function doneWithResponse(response) {
+  // Request scripts need the nested Surge/Loon response envelope. Response
+  // scripts modify the current response with top-level status/headers/body.
+  if (isResponsePhase()) {
+    $done(response);
+  } else {
+    $done({ response });
+  }
+}
 
 function getConfiguration() {
   const defaults = {
@@ -24,37 +84,40 @@ function getConfiguration() {
     max_tokens: 400
   };
 
-  // Parse Surge module arguments: argument="key1=val1&key2=val2"
-  if (typeof $argument === "string" && $argument.trim()) {
-    const pairs = $argument.split("&");
-    for (const pair of pairs) {
-      const [rawKey, ...valParts] = pair.split("=");
-      if (!rawKey) continue;
-      const key = rawKey.trim();
-      const val = decodeURIComponent(valParts.join("=").trim());
-      if (key === "endpoint" && val) defaults.endpoint = val;
-      if (key === "api_key" && val) defaults.api_key = val;
-      if (key === "model" && val) defaults.model = val;
-      if (key === "notify" && val) defaults.notify = val.toLowerCase();
-      if (key === "fallback") defaults.fallback = val === "true" || val === "1";
-      if (key === "timeout_writing" && val) defaults.timeout_writing = parseInt(val, 10) || 15;
-      if (key === "timeout_siri" && val) defaults.timeout_siri = parseInt(val, 10) || 7;
-      if (key === "timeout_vision" && val) defaults.timeout_vision = parseInt(val, 10) || 10;
-    }
+  const argumentMap = getArgumentMap();
+  if (argumentMap.endpoint) defaults.endpoint = String(argumentMap.endpoint);
+  if (argumentMap.api_key) defaults.api_key = String(argumentMap.api_key);
+  if (argumentMap.model) defaults.model = String(argumentMap.model);
+  if (argumentMap.notify) defaults.notify = String(argumentMap.notify).toLowerCase();
+  if (argumentMap.fallback !== undefined && argumentMap.fallback !== null && argumentMap.fallback !== "") {
+    const fallbackValue = String(argumentMap.fallback).toLowerCase();
+    defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
+  }
+  if (argumentMap.timeout_writing !== undefined && argumentMap.timeout_writing !== "") {
+    defaults.timeout_writing = parseInt(argumentMap.timeout_writing, 10) || 15;
+  }
+  if (argumentMap.timeout_siri !== undefined && argumentMap.timeout_siri !== "") {
+    defaults.timeout_siri = parseInt(argumentMap.timeout_siri, 10) || 7;
+  }
+  if (argumentMap.timeout_vision !== undefined && argumentMap.timeout_vision !== "") {
+    defaults.timeout_vision = parseInt(argumentMap.timeout_vision, 10) || 10;
   }
 
   // PersistentStore overrides (if set via custom UI or script)
   if (typeof $persistentStore !== "undefined") {
-    const psEndpoint = $persistentStore.read("SAIR_ENDPOINT");
+    const psEndpoint = readPersistent("SAIR_ENDPOINT");
     if (psEndpoint) defaults.endpoint = psEndpoint;
-    const psKey = $persistentStore.read("SAIR_API_KEY");
+    const psKey = readPersistent("SAIR_API_KEY");
     if (psKey) defaults.api_key = psKey;
-    const psModel = $persistentStore.read("SAIR_MODEL");
+    const psModel = readPersistent("SAIR_MODEL");
     if (psModel) defaults.model = psModel;
-    const psNotify = $persistentStore.read("SAIR_NOTIFY");
-    if (psNotify) defaults.notify = psNotify.toLowerCase();
-    const psFallback = $persistentStore.read("SAIR_FALLBACK");
-    if (psFallback !== null && psFallback !== undefined) defaults.fallback = psFallback === "true" || psFallback === "1";
+    const psNotify = readPersistent("SAIR_NOTIFY");
+    if (psNotify) defaults.notify = String(psNotify).toLowerCase();
+    const psFallback = readPersistent("SAIR_FALLBACK");
+    if (psFallback !== null && psFallback !== undefined) {
+      const fallbackValue = String(psFallback).toLowerCase();
+      defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
+    }
   }
 
   // Normalize endpoint URL: ensure /chat/completions is present if only base URL provided
@@ -68,7 +131,9 @@ function getConfiguration() {
 function notify(config, title, subtitle, message, isError = false) {
   if (config.notify === "none") return;
   if (config.notify === "all" || (config.notify === "error" && isError)) {
-    $notification.post(title, subtitle, message);
+    if (typeof $notification !== "undefined" && $notification && typeof $notification.post === "function") {
+      $notification.post(title, subtitle, message);
+    }
   }
 }
 
@@ -89,21 +154,17 @@ function handleInspectorRoute(url, config) {
       timeout: 10
     }, function(err, resp, data) {
       if (err || !data) {
-        $done({
-          response: {
-            status: 502,
-            headers: { "Content-Type": "application/json; charset=utf-8" },
-            body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err) })
-          }
+        doneWithResponse({
+          status: 502,
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err) })
         });
         return;
       }
-      $done({
-        response: {
-          status: 200,
-          headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
-          body: data
-        }
+      doneWithResponse({
+        status: 200,
+        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+        body: data
       });
     });
     return true;
@@ -114,17 +175,15 @@ function handleInspectorRoute(url, config) {
     const safeConfig = Object.assign({}, config, {
       api_key: config.api_key ? (config.api_key.slice(0, 4) + "••••••••" + config.api_key.slice(-4)) : "(none)"
     });
-    $done({
-      response: {
-        status: 200,
-        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({
-          project: "SAIR (Siri-ously AI Router)",
-          version: "1.0.0",
-          active_configuration: safeConfig,
-          timestamp: new Date().toISOString()
-        }, null, 2)
-      }
+    doneWithResponse({
+      status: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({
+        project: "SAIR (Siri-ously AI Router)",
+        version: "1.0.0",
+        active_configuration: safeConfig,
+        timestamp: new Date().toISOString()
+      }, null, 2)
     });
     return true;
   }
@@ -409,7 +468,7 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
     return;
   }
 
-  const isRequest = typeof $response === "undefined";
+  const isRequest = !isResponsePhase();
 
   // -----------------------------------------------------------------------
   // Phase 1: HTTP-REQUEST (Capture Prompt / Image & Cache)
@@ -419,12 +478,12 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
     const { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
 
     if (prompt || imageUrl) {
-      $persistentStore.write(prompt, "SAIR_LATEST_PROMPT");
-      $persistentStore.write(scenario, "SAIR_LATEST_SCENARIO");
+      writePersistent(prompt, "SAIR_LATEST_PROMPT");
+      writePersistent(scenario, "SAIR_LATEST_SCENARIO");
       if (imageUrl && imageUrl.length < 500000) {
-        $persistentStore.write(imageUrl, "SAIR_LATEST_IMAGE");
+        writePersistent(imageUrl, "SAIR_LATEST_IMAGE");
       }
-      $persistentStore.write(String(Date.now()), "SAIR_LATEST_TIME");
+      writePersistent(String(Date.now()), "SAIR_LATEST_TIME");
 
       const label = scenario === "vision" ? "[视觉智能]" : (scenario === "writing" ? "[写作工具]" : "[Siri问答]");
       notify(config, "SAIR 拦截成功", label, (prompt || (imageUrl ? "图像输入" : "")).slice(0, 40), false);
@@ -445,10 +504,10 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
   // Resolve prompt, image, and scenario
   let { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
   if (!prompt && !imageUrl) {
-    const cachedPrompt = $persistentStore.read("SAIR_LATEST_PROMPT") || "";
-    const cachedImage = $persistentStore.read("SAIR_LATEST_IMAGE") || "";
-    const cachedScenario = $persistentStore.read("SAIR_LATEST_SCENARIO") || "general";
-    const promptTime = Number($persistentStore.read("SAIR_LATEST_TIME") || 0);
+    const cachedPrompt = readPersistent("SAIR_LATEST_PROMPT") || "";
+    const cachedImage = readPersistent("SAIR_LATEST_IMAGE") || "";
+    const cachedScenario = readPersistent("SAIR_LATEST_SCENARIO") || "general";
+    const promptTime = Number(readPersistent("SAIR_LATEST_TIME") || 0);
     if (Date.now() - promptTime < 60000) {
       prompt = cachedPrompt;
       imageUrl = cachedImage;
@@ -476,7 +535,11 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
           $done({});
         } else {
           notify(config, "SAIR 请求异常", errMsg || "自定义模型调用失败", "已按配置阻断请求 (未回退官方)", true);
-          $done({ response: { status: 504, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: errMsg || "Custom model gateway timeout/failure" }) } });
+          doneWithResponse({
+            status: 504,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ error: errMsg || "Custom model gateway timeout/failure" })
+          });
         }
       }
     }
