@@ -103,7 +103,9 @@ sequenceDiagram
 下面的入口用于打开对应客户端的导入流程。导入完成后仍需在模块 / 插件参数中填写
 上游地址和 API Key，并按客户端要求开启 MITM 和证书信任。
 
-一键导入使用最新 Release 资产；模块和插件运行时引用的适配脚本固定使用 `main` 地址。
+一键导入使用仓库内的模块 / 插件文件；模块和插件运行时引用的适配脚本固定使用 `main` 地址。
+
+GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免自定义协议被页面过滤。
 
 <table>
   <thead>
@@ -115,12 +117,12 @@ sequenceDiagram
   <tbody>
     <tr>
       <td>
-        <a href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.sgmodule">点击一键导入 Surge 模块</a>
+        <a href="sgmodule/sair.sgmodule?raw=true">点击一键导入 Surge 模块</a>
       </td>
       <td>
-        <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">点击一键导入 Loon 插件</a>
+        <a href="loon/sair.plugin?raw=true">点击一键导入 Loon 插件</a>
         <br />
-        <sub><a href="loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">使用 Loon Scheme</a></sub>
+        <sub><a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">使用 Loon 导入页</a></sub>
       </td>
     </tr>
   </tbody>
@@ -128,7 +130,7 @@ sequenceDiagram
 
 ### 手动安装 Surge 模块
 
-如果一键链接没有唤起 Surge，也可以在 Surge iOS 中打开 **模块 → 安装新模块**，填入：
+如果一键链接没有直接交给 Surge，也可以在 Surge iOS 中打开 **模块 → 安装新模块**，填入：
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
