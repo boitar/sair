@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 440" width="100%" height="100%" role="img" aria-labelledby="title desc">
+  <title id="title">SAIR — Siri-ously AI Router</title>
+  <desc id="desc">A minimal dark routing diagram connecting Apple Intelligence, the SAIR adapter, and OpenAI-compatible model providers.</desc>
+
+  <defs>
+    <linearGradient id="background" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070912" />
+      <stop offset="55%" stop-color="#101329" />
+      <stop offset="100%" stop-color="#080B14" />
+    </linearGradient>
+    <linearGradient id="spectrum" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="38%" stop-color="#F472B6" />
+      <stop offset="68%" stop-color="#FB923C" />
+      <stop offset="100%" stop-color="#67E8F9" />
+    </linearGradient>
+    <linearGradient id="node-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C4B5FD" stop-opacity="0.68" />
+      <stop offset="55%" stop-color="#F472B6" stop-opacity="0.38" />
+      <stop offset="100%" stop-color="#67E8F9" stop-opacity="0.68" />
+    </linearGradient>
+    <linearGradient id="connector" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="50%" stop-color="#F472B6" />
+      <stop offset="100%" stop-color="#67E8F9" />
+    </linearGradient>
+    <radialGradient id="violet-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.24" />
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="cyan-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#22D3EE" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#FFFFFF" stroke-width="0.6" stroke-opacity="0.035" />
+      <circle cx="32" cy="32" r="0.9" fill="#FFFFFF" fill-opacity="0.08" />
+    </pattern>
+    <clipPath id="canvas">
+      <rect x="8" y="8" width="1264" height="424" rx="30" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#canvas)">
+    <rect x="8" y="8" width="1264" height="424" fill="url(#background)" />
+    <circle cx="900" cy="180" r="360" fill="url(#violet-glow)" />
+    <circle cx="1190" cy="340" r="300" fill="url(#cyan-glow)" />
+    <rect x="8" y="8" width="1264" height="424" fill="url(#grid)" />
+
+    <path d="M110 9H1170" stroke="url(#spectrum)" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+    <path d="M78 392H510" stroke="#FFFFFF" stroke-opacity="0.08" />
+
+    <g transform="translate(76 62)">
+      <rect width="274" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.05" stroke="#FFFFFF" stroke-opacity="0.13" />
+      <circle cx="18" cy="15" r="4" fill="#F472B6" />
+      <circle cx="18" cy="15" r="8" fill="#A78BFA" fill-opacity="0.3" />
+      <text x="34" y="19" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.8">APPLE INTELLIGENCE  ×  SURGE</text>
+    </g>
+
+    <text x="72" y="174" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-size="92" font-weight="800" letter-spacing="-4">SAIR</text>
+    <text x="78" y="216" fill="#F9A8D4" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-size="25" font-weight="600">Siri-ously AI Router</text>
+    <rect x="78" y="232" width="238" height="3" rx="1.5" fill="url(#spectrum)" />
+    <text x="78" y="270" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="16" font-weight="500">把系统级智能，路由到你选择的模型</text>
+    <text x="78" y="298" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="13">China Mainland Apple Intelligence · iOS 27.3+</text>
+
+    <g transform="translate(78 338)">
+      <rect width="124" height="32" rx="10" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.11" />
+      <text x="62" y="21" text-anchor="middle" fill="#E9D5FF" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10.5">27-state SSE</text>
+      <rect x="136" width="124" height="32" rx="10" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.11" />
+      <text x="198" y="21" text-anchor="middle" fill="#BAE6FD" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10.5">OpenAI-compatible</text>
+      <rect x="272" width="116" height="32" rx="10" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.11" />
+      <text x="330" y="21" text-anchor="middle" fill="#A7F3D0" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10.5">Fallback ready</text>
+    </g>
+
+    <g transform="translate(602 58)">
+      <rect width="604" height="324" rx="26" fill="#FFFFFF" fill-opacity="0.025" stroke="#FFFFFF" stroke-opacity="0.1" />
+      <path d="M0 43H604" stroke="#FFFFFF" stroke-opacity="0.065" />
+      <circle cx="25" cy="22" r="4" fill="#F87171" fill-opacity="0.75" />
+      <circle cx="39" cy="22" r="4" fill="#FBBF24" fill-opacity="0.75" />
+      <circle cx="53" cy="22" r="4" fill="#34D399" fill-opacity="0.75" />
+      <text x="74" y="26" fill="#64748B" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10.5">LOCAL ROUTING LAYER / HTTPS → SSE → CHAT COMPLETIONS</text>
+
+      <path d="M152 186H212" stroke="url(#connector)" stroke-width="2.4" />
+      <path d="M372 146C410 146 410 91 448 91" fill="none" stroke="url(#connector)" stroke-width="2.2" />
+      <path d="M372 169C410 169 410 151 448 151" fill="none" stroke="url(#connector)" stroke-width="2.2" />
+      <path d="M372 192C410 192 410 211 448 211" fill="none" stroke="url(#connector)" stroke-width="2.2" />
+      <path d="M372 215C410 215 410 271 448 271" fill="none" stroke="url(#connector)" stroke-width="2.2" />
+      <path d="M152 186H212" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="4 5" stroke-opacity="0.65" />
+      <circle cx="152" cy="186" r="4" fill="#F472B6" />
+      <circle cx="212" cy="186" r="4" fill="#67E8F9" />
+      <circle cx="372" cy="146" r="3" fill="#A78BFA" />
+      <circle cx="372" cy="169" r="3" fill="#F472B6" />
+      <circle cx="372" cy="192" r="3" fill="#FB923C" />
+      <circle cx="372" cy="215" r="3" fill="#67E8F9" />
+
+      <g transform="translate(28 104)">
+        <rect width="124" height="164" rx="20" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.12" />
+        <rect x="38" y="24" width="48" height="48" rx="15" fill="#0B0F1B" stroke="url(#node-border)" stroke-width="1.6" />
+        <path d="M62 35C63.3 44 65.5 46.2 74.5 47.5C65.5 48.8 63.3 51 62 60C60.7 51 58.5 48.8 49.5 47.5C58.5 46.2 60.7 44 62 35Z" fill="#F472B6" />
+        <circle cx="71" cy="39" r="2" fill="#67E8F9" />
+        <text x="62" y="101" text-anchor="middle" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif" font-size="14" font-weight="600">Apple 智能</text>
+        <text x="62" y="123" text-anchor="middle" fill="#94A3B8" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10">Direct TLS 1.3</text>
+        <text x="62" y="145" text-anchor="middle" fill="#CBD5E1" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="10.5">原生入口</text>
+      </g>
+
+      <g transform="translate(212 84)">
+        <rect x="-3" y="-3" width="166" height="204" rx="25" fill="none" stroke="url(#node-border)" stroke-width="1.2" opacity="0.55" />
+        <rect width="160" height="198" rx="23" fill="#17162D" fill-opacity="0.8" stroke="url(#node-border)" stroke-width="1.5" />
+        <rect x="39" y="18" width="82" height="22" rx="7" fill="#FFFFFF" fill-opacity="0.08" />
+        <text x="80" y="33" text-anchor="middle" fill="#F9A8D4" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10" font-weight="600" letter-spacing="1">DUAL-HOOK</text>
+        <circle cx="80" cy="90" r="32" fill="#0B0F1B" stroke="#C4B5FD" stroke-opacity="0.6" stroke-width="1.5" />
+        <circle cx="80" cy="90" r="23" fill="none" stroke="#F472B6" stroke-width="1.4" stroke-dasharray="5 4" />
+        <path d="M68 90H92M85 83L92 90L85 97" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="80" y="143" text-anchor="middle" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-size="16" font-weight="700">SAIR Engine</text>
+        <text x="80" y="163" text-anchor="middle" fill="#C4B5FD" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="10.5">schema adapter</text>
+        <rect x="27" y="174" width="106" height="18" rx="7" fill="#10B981" fill-opacity="0.12" />
+        <text x="80" y="187" text-anchor="middle" fill="#A7F3D0" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="10">auto fallback</text>
+      </g>
+
+      <g transform="translate(448 66)">
+        <g>
+          <rect width="130" height="50" rx="14" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.12" />
+          <circle cx="19" cy="25" r="5" fill="#34D399" fill-opacity="0.2" stroke="#34D399" stroke-width="1.3" />
+          <text x="34" y="22" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="13" font-weight="600">OpenAI</text>
+          <text x="34" y="38" fill="#94A3B8" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="9.5">GPT / o-series</text>
+        </g>
+        <g transform="translate(0 60)">
+          <rect width="130" height="50" rx="14" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.12" />
+          <circle cx="19" cy="25" r="5" fill="#60A5FA" fill-opacity="0.2" stroke="#60A5FA" stroke-width="1.3" />
+          <text x="34" y="22" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="13" font-weight="600">Gemini</text>
+          <text x="34" y="38" fill="#94A3B8" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="9.5">Flash / Pro</text>
+        </g>
+        <g transform="translate(0 120)">
+          <rect width="130" height="50" rx="14" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.12" />
+          <circle cx="19" cy="25" r="5" fill="#FBBF24" fill-opacity="0.2" stroke="#FBBF24" stroke-width="1.3" />
+          <text x="34" y="22" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="13" font-weight="600">Claude</text>
+          <text x="34" y="38" fill="#94A3B8" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="9.5">Sonnet / Haiku</text>
+        </g>
+        <g transform="translate(0 180)">
+          <rect width="130" height="50" rx="14" fill="#FFFFFF" fill-opacity="0.045" stroke="#FFFFFF" stroke-opacity="0.12" />
+          <circle cx="19" cy="25" r="5" fill="#818CF8" fill-opacity="0.2" stroke="#818CF8" stroke-width="1.3" />
+          <text x="34" y="22" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="13" font-weight="600">DeepSeek+</text>
+          <text x="34" y="38" fill="#94A3B8" font-family="'SF Mono', 'JetBrains Mono', Menlo, monospace" font-size="9.5">local / custom</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <rect x="8" y="8" width="1264" height="424" rx="30" fill="none" stroke="url(#node-border)" stroke-opacity="0.42" stroke-width="1.4" />
+</svg>
