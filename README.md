@@ -103,14 +103,7 @@ sequenceDiagram
 下面的入口用于打开对应客户端的导入流程。导入完成后仍需在模块 / 插件参数中填写
 上游地址和 API Key，并按客户端要求开启 MITM 和证书信任。
 
-当前一键导入入口来自 `custom` 开发分支；模块和插件运行时引用的适配脚本固定使用 `main`
-地址，以便把开发中的安装入口与稳定脚本版本分开。
-
-> [!WARNING]
-> 当前仓库是私有仓库。Surge / Loon 的导入请求不会复用 GitHub 的登录态，因此客户端无法直接读取私有
-> `raw.githubusercontent.com` 文件。要让其他用户真正一键导入，需要把模块和插件放到公开 HTTPS 地址；
-> 在当前仓库状态下，下面的 Surge Scheme 只能复制到 iOS Safari 地址栏中打开，Loon 链接也只适用于
-> 已能访问该源文件的环境。
+一键导入使用最新 Release 资产；模块和插件运行时引用的适配脚本固定使用 `main` 地址。
 
 <table>
   <thead>
@@ -122,17 +115,12 @@ sequenceDiagram
   <tbody>
     <tr>
       <td>
-        <strong>Surge 导入地址</strong><br />
-        <code>surge:///install-config?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Fsgmodule%2Fsair.sgmodule</code>
-        <br />
-        <sub>复制到 iOS Safari 地址栏打开</sub>
-        <br />
-        <sub><a href="https://github.com/boitar/sair/blob/custom/sgmodule/sair.sgmodule">查看模块文件</a></sub>
+        <a href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.sgmodule">点击一键导入 Surge 模块</a>
       </td>
       <td>
-        <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">点击导入 Loon 插件</a>
+        <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">点击一键导入 Loon 插件</a>
         <br />
-        <sub><a href="loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">使用 Loon Scheme</a></sub>
+        <sub><a href="loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">使用 Loon Scheme</a></sub>
       </td>
     </tr>
   </tbody>
@@ -140,8 +128,7 @@ sequenceDiagram
 
 ### 手动安装 Surge 模块
 
-如果 Surge Scheme 没有唤起 Surge，或当前页面无法复制链接，可以在 Surge iOS 中打开
-**模块 → 安装新模块**，填入：
+如果一键链接没有唤起 Surge，也可以在 Surge iOS 中打开 **模块 → 安装新模块**，填入：
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
