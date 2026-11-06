@@ -105,7 +105,7 @@ provider endpoint and API key in the module/plugin arguments, then enable MITM a
 trust as required by the client.
 
 The one-click import entries come from the `custom` development branch; the module and plugin load
-the adapter script from `master` so the installation entry and runtime script can evolve separately.
+the adapter script from `main` so the installation entry and runtime script can evolve separately.
 
 <table>
   <thead>
