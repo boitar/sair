@@ -5,14 +5,15 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#prerequisites)
-[![Engine](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](sgmodule/sair.sgmodule)
+[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](sgmodule/sair.sgmodule)
+[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](loon/sair.plugin)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#provider-configuration-examples)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
 
 <p align="center">
   <b>Your Intelligence. Your Models.</b><br />
-  A lightweight, zero-dependency model router for Mainland China Apple Intelligence (iOS 27.3+) powered by Surge.
+  A lightweight, zero-dependency model router for Mainland China Apple Intelligence (iOS 27.3+) powered by Surge and Loon.
 </p>
 
 <p align="center">
@@ -23,6 +24,7 @@
   <a href="#key-features">Key features</a> ·
   <a href="#architecture-and-request-flow">Architecture</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="#one-click-installation">One-click install</a> ·
   <a href="#configuration-reference">Configuration</a> ·
   <a href="#provider-configuration-examples">Examples</a> ·
   <a href="#faq">FAQ</a>
@@ -34,7 +36,7 @@
 
 ## Overview
 
-**Apple Intelligence** extensions in Mainland China connect directly from the device to Alibaba's Qwen gateway (`prod-yabuli.qianwen.com`) over standard TLS 1.3. SAIR uses Surge's `http-request` and `http-response` hooks to transparently intercept the flow, dispatch the prompt to a custom model gateway, and rewrite the returned SSE payload on-device.
+**Apple Intelligence** extensions in Mainland China connect directly from the device to Alibaba's Qwen gateway (`prod-yabuli.qianwen.com`) over standard TLS 1.3. SAIR uses Surge or Loon `http-request` and `http-response` hooks to transparently intercept the flow, dispatch the prompt to a custom model gateway, and rewrite the returned SSE payload on-device.
 
 The native **Writing Tools**, **Siri QA**, and **Visual Intelligence** entry points remain unchanged. The underlying model can be switched to any provider compatible with OpenAI `/v1/chat/completions`, including OpenAI, Gemini, Claude, DeepSeek, OpenRouter, or self-hosted Ollama / vLLM gateways.
 
@@ -90,23 +92,65 @@ See [`docs/protocol_analysis.md`](docs/protocol_analysis.md) for the complete to
 ### Prerequisites
 
 1. **Device and OS**: An iPhone or iPad running iOS 27.3+ with Mainland China Apple Intelligence enabled.
-2. **Surge iOS**: Surge iOS 5.x+ with **MITM**, **Rewrite**, and **Scripting** enabled.
-3. **Certificate trust**: Fully trust the Surge CA certificate under *Settings → General → About → Certificate Trust Settings*.
+2. **Proxy client**: Surge iOS 5.x+ with **MITM**, **Rewrite**, and **Scripting** enabled, or Loon 3.5.1 (983)+.
+3. **Certificate trust**: Fully trust the selected client's MITM CA certificate under *Settings → General → About → Certificate Trust Settings*.
 4. **Provider credentials**: An upstream service and API key compatible with OpenAI `/v1/chat/completions`.
 
-### Step 1: Install the Surge module
+### One-click installation
 
-In Surge iOS, open **Modules → Install New Module** and enter:
+This is the recommended installation path.
+
+The buttons below open the import flow in the selected client. After importing, fill in the
+provider endpoint and API key in the module/plugin arguments, then enable MITM and certificate
+trust as required by the client.
+
+The one-click import entries come from the `custom` development branch; the module and plugin load
+the adapter script from `master` so the installation entry and runtime script can evolve separately.
+
+<table>
+  <thead>
+    <tr>
+      <th>Surge</th>
+      <th>Loon</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Fsgmodule%2Fsair.sgmodule">Import the Surge module</a>
+      </td>
+      <td>
+        <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">Import the Loon plugin</a>
+        <br />
+        <sub><a href="loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">Use the Loon scheme</a></sub>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+### Manual Surge module installation
+
+If the one-click link does not open Surge, open **Modules → Install New Module** in Surge iOS and enter:
 
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
+https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
 ```
 
 The module adds the MITM hostname and registers SAIR's request and response hooks automatically.
 
-### Step 2: Configure the model gateway
+### Manual Loon plugin installation
 
-Open **Modules → SAIR → Edit Arguments** and enter your provider endpoint and API key:
+If the one-click link does not open Loon, open **Plugins → Add Plugin** in Loon and enter:
+
+```text
+https://raw.githubusercontent.com/boitar/sair/custom/loon/sair.plugin
+```
+
+After enabling it, Loon will show the configurable SAIR arguments.
+
+### Configure the model gateway
+
+In **Modules → SAIR → Edit Arguments** in Surge, or in the SAIR plugin argument panel in Loon, enter your provider endpoint and API key:
 
 ```ini
 endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini
@@ -114,9 +158,14 @@ endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&mode
 
 If you provide only a provider's `/v1` base URL, the script appends `/chat/completions` automatically.
 
-### Step 3: Verify in Safari
+The Loon plugin registers the shared [`scripts/sair_adapter.js`](scripts/sair_adapter.js) for both
+request and response phases and appends `prod-yabuli.qianwen.com` to the MITM hostname list. `notify`,
+`fallback`, and the three scenario timeouts are also configurable there; the script accepts both
+Loon's argument object and Surge's `key=value` argument string.
 
-Keep Surge running and open these endpoints in Safari:
+### Verify in Safari
+
+Keep the selected proxy client running and open these endpoints in Safari:
 
 - **Runtime status and active configuration**: [`https://prod-yabuli.qianwen.com/sair/status`](https://prod-yabuli.qianwen.com/sair/status)
 - **Upstream model discovery**: [`https://prod-yabuli.qianwen.com/sair/models`](https://prod-yabuli.qianwen.com/sair/models)
@@ -125,7 +174,7 @@ Keep Surge running and open these endpoints in Safari:
 
 ## Configuration reference
 
-### Module arguments
+### Module / plugin arguments
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
@@ -143,7 +192,7 @@ Keep Surge running and open these endpoints in Safari:
 When the same option is set in multiple places, the order is:
 
 ```text
-$persistentStore override > Surge module argument > script default
+$persistentStore override > client module/plugin argument > script default
 ```
 
 Supported persistent store keys:
@@ -197,10 +246,11 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 ## Compatibility and known limitations
 
-- SAIR targets Surge iOS 5.x+ and its dual-hook scripting lifecycle. Other proxy clients require their own API and rule adaptations.
+- SAIR provides a Surge iOS 5.x+ module and a Loon 3.5.1 (983)+ plugin backed by the same dual-phase adapter.
+- The Loon plugin uses the newer Script syntax for object arguments; upgrade Loon to the declared minimum before installing it.
 - The official Qwen channel must remain reachable because SAIR uses the original request and SSE session skeleton for response rewriting.
 - Siri's waiting window is short, so complex reasoning models may trigger the official fallback.
-- Visual Intelligence images consume Surge's request-body buffer; the module sets `max-size` to `16777216` (16 MB).
+- Visual Intelligence images consume the proxy script request-body buffer; the Surge module sets `max-size` to `16777216` (16 MB).
 - SAIR handles OpenAI Chat Completions-compatible upstreams. It does not translate arbitrary provider protocols.
 
 ## Repository structure
@@ -212,9 +262,11 @@ SAIR/
 ├── docs/
 │   └── protocol_analysis.md    # Network topology and 27-state SSE analysis
 ├── scripts/
-│   └── sair_adapter.js         # Dual-hook adapter and SSE rewriter
+│   └── sair_adapter.js         # Surge / Loon dual-phase adapter and SSE rewriter
 ├── sgmodule/
 │   └── sair.sgmodule           # Surge iOS module definition
+├── loon/
+│   └── sair.plugin             # Loon plugin definition and arguments
 ├── LICENSE                     # MIT License
 ├── README.md                   # Primary Simplified Chinese documentation
 └── README_EN.md                # English documentation
@@ -233,14 +285,16 @@ The upstream model usually exceeded `timeout_siri` (7 seconds by default) or ret
 <summary><b>2. Why is /sair/status unreachable or showing a certificate warning?</b></summary>
 <br />
 
-Make sure Surge MITM is enabled, `prod-yabuli.qianwen.com` is included in the MITM hostname list, and the Surge CA certificate is fully trusted by iOS.
+Make sure the selected client's MITM is enabled, `prod-yabuli.qianwen.com` is included in its MITM hostname list, and the corresponding CA certificate is fully trusted by iOS.
 </details>
 
 <details>
-<summary><b>3. Does this support Quantumult X, Loon, or Stash?</b></summary>
+<summary><b>3. Does this support Loon, Quantumult X, or Stash?</b></summary>
 <br />
 
-The current version is verified against Surge iOS's dual-hook lifecycle. Porting requires adapting the rules in [`sgmodule/sair.sgmodule`](sgmodule/sair.sgmodule) and mapping the `$httpClient` and `$persistentStore` APIs used by [`scripts/sair_adapter.js`](scripts/sair_adapter.js).
+Loon is supported through [`loon/sair.plugin`](loon/sair.plugin). Quantumult X and Stash still
+require their own rule migration and mappings for the `$httpClient`, `$persistentStore`, and dual-phase
+`$done` lifecycle used by [`scripts/sair_adapter.js`](scripts/sair_adapter.js).
 </details>
 
 ## Disclaimer

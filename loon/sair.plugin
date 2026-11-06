@@ -1,0 +1,28 @@
+#!name = SAIR - Siri-ously AI Router
+#!desc = Route Mainland China Apple Intelligence requests to an OpenAI-compatible provider through Loon.
+#!author = boitar
+#!homepage = https://github.com/boitar/sair
+#!system = iOS,iPadOS
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-06
+#!tag = AI,Apple Intelligence,Router
+#!type = normal
+
+[Argument]
+endpoint = input,"https://api.openai.com/v1/chat/completions",type=string,tag=Endpoint,desc=OpenAI-compatible /v1/chat/completions URL or /v1 base URL
+api_key = input,"",type=string,tag=API Key,desc=Provider API key; leave empty when the endpoint does not require one
+model = input,"gpt-4o-mini",type=string,tag=Model,desc=Upstream model name
+notify = select,error,all,none,type=string,tag=Notifications,desc=error notifies failures; all notifies every stage; none stays silent
+fallback = switch,true,type=boolean,tag=Official fallback,desc=Pass through the official Qwen response on timeout or upstream failure
+timeout_siri = input,7,type=number,tag=Siri timeout,desc=Timeout in seconds for Siri QA
+timeout_writing = input,15,type=number,tag=Writing timeout,desc=Timeout in seconds for Writing Tools
+timeout_vision = input,10,type=number,tag=Vision timeout,desc=Timeout in seconds for Visual Intelligence
+
+[Script]
+request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(?:status|config|models)(?:[/?].*)?$/i then script("https://raw.githubusercontent.com/boitar/sair/master/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}}) with tag="SAIR Inspector Request", timeout=15, requires_body=false
+response if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(?:status|config|models)(?:[/?].*)?$/i then script("https://raw.githubusercontent.com/boitar/sair/master/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}}) with tag="SAIR Inspector Response", timeout=15, requires_body=false
+request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/master/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}}) with tag="SAIR Request", timeout=60, requires_body=true
+response if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/master/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}}) with tag="SAIR Response", timeout=60, requires_body=true
+
+[Mitm]
+hostname = %APPEND% prod-yabuli.qianwen.com
