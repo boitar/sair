@@ -104,8 +104,10 @@ The entries below open the import flow in the selected client. After importing, 
 provider endpoint and API key in the module/plugin arguments, then enable MITM and certificate
 trust as required by the client.
 
-The one-click import entries use the latest Release assets; the module and plugin load the adapter
-script from `main`.
+The one-click import entries use HTTPS raw links to the module/plugin files in this repository; the
+module and plugin load the adapter script from `main`.
+
+Using repository-relative HTTPS links keeps the entries clickable in GitHub-rendered pages.
 
 <table>
   <thead>
@@ -117,12 +119,12 @@ script from `main`.
   <tbody>
     <tr>
       <td>
-        <a href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.sgmodule">Import the Surge module</a>
+        <a href="sgmodule/sair.sgmodule?raw=true">Import the Surge module</a>
       </td>
       <td>
-        <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">Import the Loon plugin</a>
+        <a href="loon/sair.plugin?raw=true">Import the Loon plugin</a>
         <br />
-        <sub><a href="loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2FSAIR.plugin">Use the Loon scheme</a></sub>
+        <sub><a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">Use the Loon import page</a></sub>
       </td>
     </tr>
   </tbody>
@@ -130,7 +132,7 @@ script from `main`.
 
 ### Manual Surge module installation
 
-If the one-click link does not open Surge, open **Modules → Install New Module** in Surge iOS and enter:
+If the one-click link does not hand the file to Surge, open **Modules → Install New Module** in Surge iOS and enter:
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
