@@ -100,12 +100,19 @@ See [`docs/protocol_analysis.md`](docs/protocol_analysis.md) for the complete to
 
 This is the recommended installation path.
 
-The buttons below open the import flow in the selected client. After importing, fill in the
+The entries below open the import flow in the selected client. After importing, fill in the
 provider endpoint and API key in the module/plugin arguments, then enable MITM and certificate
 trust as required by the client.
 
 The one-click import entries come from the `custom` development branch; the module and plugin load
 the adapter script from `main` so the installation entry and runtime script can evolve separately.
+
+> [!WARNING]
+> This repository is private. Surge and Loon import requests do not reuse your GitHub login session,
+> so the clients cannot fetch private `raw.githubusercontent.com` files directly. A real one-click
+> import for other users requires hosting the module and plugin at public HTTPS URLs. In the current
+> repository state, copy the Surge Scheme into the iOS Safari address bar; the Loon link only works
+> where the source file is reachable.
 
 <table>
   <thead>
@@ -117,7 +124,12 @@ the adapter script from `main` so the installation entry and runtime script can 
   <tbody>
     <tr>
       <td>
-        <a href="surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Fsgmodule%2Fsair.sgmodule">Import the Surge module</a>
+        <strong>Surge import address</strong><br />
+        <code>surge:///install-config?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Fsgmodule%2Fsair.sgmodule</code>
+        <br />
+        <sub>Copy it into the iOS Safari address bar</sub>
+        <br />
+        <sub><a href="https://github.com/boitar/sair/blob/custom/sgmodule/sair.sgmodule">View the module file</a></sub>
       </td>
       <td>
         <a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">Import the Loon plugin</a>
@@ -130,7 +142,8 @@ the adapter script from `main` so the installation entry and runtime script can 
 
 ### Manual Surge module installation
 
-If the one-click link does not open Surge, open **Modules → Install New Module** in Surge iOS and enter:
+If the Surge Scheme does not open Surge, or the current page cannot copy it, open
+**Modules → Install New Module** in Surge iOS and enter:
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
