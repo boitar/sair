@@ -108,14 +108,14 @@ See [`docs/protocol_analysis.md`](docs/protocol_analysis.md) for the complete to
 
 You can also trigger client import directly using the official **URL Scheme** links or copy the addresses:
 
-| Client | Quick Import Scheme | Release Direct Download |
-| :--- | :--- | :--- |
-| **Surge** | [Install Surge Module](surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
-| **Loon** | [Install Loon Plugin](loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin` | [`sair.plugin`](https://github.com/boitar/sair/releases/latest/download/sair.plugin) |
-| **Stash** | [Install Stash Override](stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride` | [`sair.stoverride`](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) |
-| **Egern** | [Install Egern Module](egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml` | [`sair.yaml`](https://github.com/boitar/sair/releases/latest/download/sair.yaml) |
-| **Quantumult X** | [Install QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://github.com/boitar/sair/releases/latest/download/sair.snippet"]}` | [`sair.snippet`](https://github.com/boitar/sair/releases/latest/download/sair.snippet) |
-| **Shadowrocket** | [Install Shadowrocket Module](shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
+| Client | Quick Import Scheme (Seamless In-Place Updates) | Direct Download (GitHub Raw) | CDN Mirror (Fastly jsDelivr) |
+| :--- | :--- | :--- | :--- |
+| **Surge** | [Install Surge Module](surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fsgmodule%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fsgmodule%2Fsair.sgmodule` | [`sair.sgmodule`](https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/sgmodule/sair.sgmodule) |
+| **Loon** | [Install Loon Plugin](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Floon%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Floon%2Fsair.plugin` | [`sair.plugin`](https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/loon/sair.plugin) |
+| **Stash** | [Install Stash Override](stash://install-override?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fstash%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fstash%2Fsair.stoverride` | [`sair.stoverride`](https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/stash/sair.stoverride) |
+| **Egern** | [Install Egern Module](egern:///modules/new?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fegern%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fegern%2Fsair.yaml` | [`sair.yaml`](https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/egern/sair.yaml) |
+| **Quantumult X** | [Install QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fquantumultx%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet"]}` | [`sair.snippet`](https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/quantumultx/sair.snippet) |
+| **Shadowrocket** | [Install Shadowrocket Module](shadowrocket://install?module=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fshadowrocket%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fshadowrocket%2Fsair.sgmodule` | [`sair.sgmodule`](https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/shadowrocket/sair.sgmodule) |
 
 ### Manual Surge module installation
 
@@ -191,7 +191,7 @@ Every client provides convenient native or visual configuration methods:
 4. **Universal: Safari Native Liquid Glass Web Control Panel**:
    With your proxy active, simply open this URL in Safari:
    ```text
-   https://prod-yabuli.qianwen.com/sair/config
+   http://sair.box
    ```
    This serves a self-contained Apple Liquid Glass Web UI featuring quick provider presets (OpenAI, DeepSeek, Gemini, Moonshot, local Ollama), instant persistent storage saving, and an upstream model probe (`/sair/models`). Perfect for Stash, Quantumult X, and Egern without modifying any code.
 
