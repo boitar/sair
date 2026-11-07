@@ -1,73 +1,55 @@
 name: SAIR - Siri-ously AI Router
-description: 国行 Apple 智能大模型重写模块：通过 Egern 模块与脚本重写将 Apple 智能请求转接至自定义大模型服务。
+description: 国行 Apple 智能大模型重写模块：通过 Egern 模块与脚本重写将 Apple 智能请求转接至自定义大模型服务。安装后在 Safari 访问 http://sair.box 即可直达 Liquid Glass 控制台。
 author: boitar
 homepage: https://github.com/boitar/sair
+
+hosts:
+  sair.box: 198.18.41.218
+  sair.hub: 198.18.41.219
+  sair.ai: 198.18.41.220
+
+rules:
+  - domain: sair.box
+    policy: DIRECT
+  - domain: sair.hub
+    policy: DIRECT
+  - domain: sair.ai
+    policy: DIRECT
+  - domain_suffix: sair.box
+    policy: DIRECT
+  - domain_suffix: sair.hub
+    policy: DIRECT
+  - domain_suffix: sair.ai
+    policy: DIRECT
 
 mitm:
   hostnames:
     - prod-yabuli.qianwen.com
+    - sair.box
+    - "*.sair.box"
+    - sair.hub
+    - "*.sair.hub"
+    - sair.ai
+    - "*.sair.ai"
 
 scriptings:
-  - name: SAIR Inspector Request
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+  - name: SAIR Dashboard
+    match: ^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$
     type: request
     require_body: false
     timeout: 15
-    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    arguments:
-      endpoint: https://api.openai.com/v1/chat/completions
-      api_key: ""
-      model: gpt-4o-mini
-      notify: error
-      fallback: true
-      timeout_siri: 7
-      timeout_writing: 15
-      timeout_vision: 10
-
-  - name: SAIR Inspector Response
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
-    type: response
-    require_body: false
-    timeout: 15
-    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    arguments:
-      endpoint: https://api.openai.com/v1/chat/completions
-      api_key: ""
-      model: gpt-4o-mini
-      notify: error
-      fallback: true
-      timeout_siri: 7
-      timeout_writing: 15
-      timeout_vision: 10
+    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
 
   - name: SAIR Request
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
     type: request
     require_body: true
     timeout: 60
-    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    arguments:
-      endpoint: https://api.openai.com/v1/chat/completions
-      api_key: ""
-      model: gpt-4o-mini
-      notify: error
-      fallback: true
-      timeout_siri: 7
-      timeout_writing: 15
-      timeout_vision: 10
+    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
 
   - name: SAIR Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
     type: response
     require_body: true
     timeout: 60
-    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    arguments:
-      endpoint: https://api.openai.com/v1/chat/completions
-      api_key: ""
-      model: gpt-4o-mini
-      notify: error
-      fallback: true
-      timeout_siri: 7
-      timeout_writing: 15
-      timeout_vision: 10
+    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js

@@ -7,6 +7,7 @@
 #!date = 2026-11-06
 #!tag = AI,Apple Intelligence,Router
 #!type = normal
+#!openUrl = http://sair.box
 
 [Argument]
 endpoint = input,"https://api.openai.com/v1/chat/completions",tag="Endpoint",desc="OpenAI 兼容的 /v1/chat/completions 接口地址"
@@ -37,5 +38,5 @@ request if ${url} ~= /^https?:\/\/(?:sair\.(?:box|hub|ai|local)|127\.0\.0\.1(?::
 request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Request", timeout=60, requires_body=true
 response if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Response", timeout=60, requires_body=true
 
-[Mitm]
-hostname = %APPEND% prod-yabuli.qianwen.com, sair.box, sair.hub, sair.ai
+[MITM]
+hostname = prod-yabuli.qianwen.com, sair.box, *.sair.box, sair.hub, *.sair.hub, sair.ai, *.sair.ai

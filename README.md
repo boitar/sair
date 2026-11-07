@@ -193,11 +193,13 @@ https://github.com/boitar/sair/releases/latest/download/sair.yaml
 2. **Loon 原生插件面板**：在 **配置 → 插件 → SAIR** 中，Loon 原生卡片提供了各参数输入框与开关选择器。
 3. **Shadowrocket 原生参数面板**：在 **配置 → 模块 → SAIR → 编辑参数** 中，支持与 Surge 一致的原生表单参数修改。
 4. **全客户端通用：Safari 原生 Liquid Glass 可视化控制台**：
-   代理启动后，直接在 Safari 中打开如下页面：
+   代理启动后，在 Safari 中直接打开自定义域名：
    ```text
-   https://prod-yabuli.qianwen.com/sair/config
+   http://sair.box (或 http://sair.hub)
    ```
-   将呈现自包含的 Apple Liquid Glass 风格 Web 控制台，支持常用服务商预设（OpenAI、DeepSeek、Gemini、Moonshot、Ollama 本地）、表单即时保存与上游模型列表探针（`/sair/models`），修改后自动写入持久化存储并立即生效，无需手动改写任何规则代码（特别适合 Stash、Quantumult X 与 Egern）。
+   *(备用回退地址：`https://prod-yabuli.qianwen.com/sair`)*
+
+   将呈现自包含的 Apple Liquid Glass 风格 Web 控制台，内置专属人格切换（🌸 nulre 妹系专属、💼 极简高效、🐱 傲娇陪伴、🤖 默认）、常用模型服务商预设（OpenAI、DeepSeek、Gemini、Moonshot、Ollama）、表单即时保存与上游模型列表探针，修改后自动写入持久化存储并立即生效，无需手动改写任何规则代码（Surge / Loon / Stash / Quantumult X / Shadowrocket / Egern 全平台通用）。
 
 如需清除持久化配置恢复模块默认值，可随时在控制台中点击重置，或在 Safari 访问：
 ```text
