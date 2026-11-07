@@ -183,24 +183,22 @@ https://github.com/boitar/sair/releases/latest/download/sair.yaml
 
 ### 配置模型网关
 
-在各客户端的模块/插件设置中填入参数，或在 Surge 的 **模块 → SAIR → 编辑参数** 中配置：
+各客户端均提供了便捷的原生或可视化调参方案：
 
-```ini
-endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini
+1. **Surge 原生参数调节**：在 **模块 → SAIR → 编辑参数** 中，可通过 Surge 原生 UI 表单直接修改 `endpoint`、`api_key`、`model`、`notify`、`fallback` 及场景超时参数。
+2. **Loon 原生插件面板**：在 **配置 → 插件 → SAIR** 中，Loon 原生卡片提供了各参数输入框与开关选择器。
+3. **Shadowrocket 原生参数面板**：在 **配置 → 模块 → SAIR → 编辑参数** 中，支持与 Surge 一致的原生表单参数修改。
+4. **全客户端通用：Safari 原生 Liquid Glass 可视化控制台**：
+   代理启动后，直接在 Safari 中打开如下页面：
+   ```text
+   https://prod-yabuli.qianwen.com/sair/config
+   ```
+   将呈现自包含的 Apple Liquid Glass 风格 Web 控制台，支持常用服务商预设（OpenAI、DeepSeek、Gemini、Moonshot、Ollama 本地）、表单即时保存与上游模型列表探针（`/sair/models`），修改后自动写入持久化存储并立即生效，无需手动改写任何规则代码（特别适合 Stash、Quantumult X 与 Egern）。
+
+如需清除持久化配置恢复模块默认值，可随时在控制台中点击重置，或在 Safari 访问：
+```text
+https://prod-yabuli.qianwen.com/sair/reset
 ```
-
-如果只填写服务商的 `/v1` 基础地址，脚本会自动补全 `/chat/completions`。
-
-> [!TIP]
-> **通用快捷配置（适用于 Quantumult X、Stash 及所有客户端）**：
-> 启动代理后，直接在 Safari 中打开如下链接，脚本会自动将参数写入持久化存储并立即生效：
-> ```text
-> https://prod-yabuli.qianwen.com/sair/config?endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini&model=gpt-4o-mini
-> ```
-> 如需清除持久化配置恢复模块默认值，在 Safari 访问：
-> ```text
-> https://prod-yabuli.qianwen.com/sair/reset
-> ```
 
 ### 在线验证
 

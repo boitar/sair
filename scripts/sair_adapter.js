@@ -106,6 +106,12 @@ function getRequestUrl() {
   return "";
 }
 
+function getRequestHeaders() {
+  if (typeof $request !== "undefined" && $request && $request.headers) return $request.headers;
+  if (typeof ctx !== "undefined" && ctx && ctx.request && ctx.request.headers) return ctx.request.headers;
+  return {};
+}
+
 function normalizeBodyToString(body) {
   if (!body) return "";
   if (typeof body === "string") return body;
@@ -188,6 +194,15 @@ function doneWithResponse(response) {
   }
 }
 
+function isValidArg(val) {
+  if (val === null || typeof val === "undefined") return false;
+  const str = String(val).trim();
+  if (!str) return false;
+  if (str.startsWith("{{{") && str.endsWith("}}}")) return false;
+  if (str.startsWith("${") && str.endsWith("}")) return false;
+  return true;
+}
+
 function getConfiguration() {
   const defaults = {
     endpoint: "https://api.openai.com/v1/chat/completions",
@@ -203,21 +218,21 @@ function getConfiguration() {
   };
 
   const argumentMap = getArgumentMap();
-  if (argumentMap.endpoint) defaults.endpoint = String(argumentMap.endpoint);
-  if (argumentMap.api_key) defaults.api_key = String(argumentMap.api_key);
-  if (argumentMap.model) defaults.model = String(argumentMap.model);
-  if (argumentMap.notify) defaults.notify = String(argumentMap.notify).toLowerCase();
-  if (argumentMap.fallback !== undefined && argumentMap.fallback !== null && argumentMap.fallback !== "") {
+  if (isValidArg(argumentMap.endpoint)) defaults.endpoint = String(argumentMap.endpoint);
+  if (isValidArg(argumentMap.api_key)) defaults.api_key = String(argumentMap.api_key);
+  if (isValidArg(argumentMap.model)) defaults.model = String(argumentMap.model);
+  if (isValidArg(argumentMap.notify)) defaults.notify = String(argumentMap.notify).toLowerCase();
+  if (isValidArg(argumentMap.fallback)) {
     const fallbackValue = String(argumentMap.fallback).toLowerCase();
     defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
   }
-  if (argumentMap.timeout_writing !== undefined && argumentMap.timeout_writing !== "") {
+  if (isValidArg(argumentMap.timeout_writing)) {
     defaults.timeout_writing = parseInt(argumentMap.timeout_writing, 10) || 15;
   }
-  if (argumentMap.timeout_siri !== undefined && argumentMap.timeout_siri !== "") {
+  if (isValidArg(argumentMap.timeout_siri)) {
     defaults.timeout_siri = parseInt(argumentMap.timeout_siri, 10) || 7;
   }
-  if (argumentMap.timeout_vision !== undefined && argumentMap.timeout_vision !== "") {
+  if (isValidArg(argumentMap.timeout_vision)) {
     defaults.timeout_vision = parseInt(argumentMap.timeout_vision, 10) || 10;
   }
 
@@ -430,6 +445,22 @@ function handleInspectorRoute(url, config) {
     }
 
     const activeConfig = getConfiguration();
+    const clientRuntime = detectClient();
+
+    const headers = getRequestHeaders();
+    const accept = (headers.Accept || headers.accept || "").toLowerCase();
+    const wantsJson = query.format === "json" || (!accept.includes("text/html") && Object.keys(query).length > 0) || url.includes("/sair/status");
+
+    if (!wantsJson && (url.includes("/sair/config") || accept.includes("text/html"))) {
+      const html = renderWebConfigDashboard(activeConfig, clientRuntime, updateNotice);
+      doneWithResponse({
+        status: 200,
+        headers: { "Content-Type": "text/html; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+        body: html
+      });
+      return true;
+    }
+
     const safeConfig = Object.assign({}, activeConfig, {
       api_key: activeConfig.api_key ? (activeConfig.api_key.slice(0, 4) + "••••••••" + activeConfig.api_key.slice(-4)) : "(none)"
     });
@@ -437,7 +468,7 @@ function handleInspectorRoute(url, config) {
     const responsePayload = {
       project: "SAIR (Siri-ously AI Router)",
       version: "1.1.0",
-      client_runtime: detectClient(),
+      client_runtime: clientRuntime,
       active_configuration: safeConfig,
       timestamp: new Date().toISOString()
     };
@@ -454,6 +485,560 @@ function handleInspectorRoute(url, config) {
   }
 
   return false;
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
+  const safeEndpoint = escapeHtml(config.endpoint || "https://api.openai.com/v1/chat/completions");
+  const rawKey = escapeHtml(config.api_key || "");
+  const safeModel = escapeHtml(config.model || "gpt-4o-mini");
+  const notifyVal = config.notify || "error";
+  const fallbackChecked = config.fallback !== false ? "checked" : "";
+  const timeoutSiri = parseInt(config.timeout_siri, 10) || 7;
+  const timeoutWriting = parseInt(config.timeout_writing, 10) || 15;
+  const timeoutVision = parseInt(config.timeout_vision, 10) || 10;
+  const noticeHtml = updateNotice ? `<div style="background:rgba(16,185,129,0.2);border:1px solid #10b981;padding:12px;border-radius:12px;margin-bottom:16px;font-size:13px;color:#10b981;">${escapeHtml(updateNotice)}</div>` : "";
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>SAIR 参数控制台 · Apple Intelligence</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --card-inner: rgba(255, 255, 255, 0.03);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #a855f7;
+      --primary-gradient: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #38bdf8 100%);
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(255, 255, 255, 0.16);
+      --input-focus: #38bdf8;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 24px 16px 48px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.12) 0px, transparent 50%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 12px 0 8px;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+    }
+    .title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 0 0 6px;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .client-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 600;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .presets-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .preset-chip {
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .preset-chip:active {
+      transform: scale(0.96);
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--primary);
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .toggle-pwd {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .switch-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .switch-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.16);
+      transition: .3s;
+      border-radius: 28px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background: var(--primary-gradient);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);
+    }
+    .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+    .btn-secondary:active { background: rgba(255, 255, 255, 0.12); }
+    .btn-outline {
+      background: transparent;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-size: 13px;
+      padding: 10px;
+    }
+    .btn-outline:active { background: rgba(239, 68, 68, 0.1); }
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 185, 129, 0.95);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      text-align: center;
+      max-width: 90%;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(10px);
+    }
+    .toast.error {
+      background: rgba(239, 68, 68, 0.95);
+    }
+    .result-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      color: #cbd5e1;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+    }
+    .footer-links {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+    .footer-links a { color: #38bdf8; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast">✅ 保存成功！已写入持久化存储</div>
+  <div class="container">
+    <div class="header">
+      <div class="logo-badge">
+        <span class="logo-dot"></span>
+        <span>SAIR Inspector</span>
+      </div>
+      <h1 class="title">SAIR 参数控制台</h1>
+      <p class="subtitle">Siri-ously AI Router · 国行 Apple 智能模型路由</p>
+      <div><span class="client-tag">当前客户端：${escapeHtml(clientRuntime)}</span></div>
+    </div>
+
+    ${noticeHtml}
+
+    <div class="card">
+      <div class="section-title">快速供应商预设</div>
+      <div class="presets-row">
+        <button type="button" class="preset-chip" onclick="applyPreset('openai')">🚀 OpenAI 官方</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('deepseek')">⚡️ DeepSeek 官方</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('gemini')">♊️ Google Gemini</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('moonshot')">🌙 Moonshot Kimi</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('ollama')">🦙 Ollama (本地)</button>
+      </div>
+
+      <form id="configForm" onsubmit="saveConfig(event)">
+        <div class="form-group">
+          <label class="form-label" for="endpoint">上游接口地址 (Endpoint)</label>
+          <input type="text" id="endpoint" name="endpoint" value="${safeEndpoint}" placeholder="https://api.openai.com/v1/chat/completions" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="api_key">上游 API Key (Bearer Token)</label>
+          <div class="input-wrapper">
+            <input type="password" id="api_key" name="api_key" value="${rawKey}" placeholder="sk-..." />
+            <button type="button" class="toggle-pwd" onclick="togglePassword(event)">显示</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="model">目标模型名称 (Model)</label>
+          <input type="text" id="model" name="model" value="${safeModel}" placeholder="gpt-4o-mini" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="notify">系统通知策略</label>
+          <select id="notify" name="notify">
+            <option value="error" ${notifyVal === "error" ? "selected" : ""}>error (仅报错与官方回退时通知)</option>
+            <option value="all" ${notifyVal === "all" ? "selected" : ""}>all (通知全部拦截与重写阶段)</option>
+            <option value="none" ${notifyVal === "none" ? "selected" : ""}>none (静默运行)</option>
+          </select>
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <div class="switch-label">官方千问回退 (Official Fallback)</div>
+            <div class="switch-desc">上游模型超时或出错时，自动放行官方千问回包保证功能可用</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="fallback" name="fallback" ${fallbackChecked} />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="section-title">场景等待超时设置 (秒)</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="timeout_siri">Siri 问答</label>
+            <input type="text" id="timeout_siri" name="timeout_siri" value="${timeoutSiri}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="timeout_writing">写作工具</label>
+            <input type="text" id="timeout_writing" name="timeout_writing" value="${timeoutWriting}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="timeout_vision">视觉相机</label>
+            <input type="text" id="timeout_vision" name="timeout_vision" value="${timeoutVision}" />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="btnSave">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+            保存配置并立即生效
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="probeModels()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            测试上游模型连通性 (/sair/models)
+          </button>
+          <button type="button" class="btn btn-outline" onclick="resetConfig()">
+            恢复默认配置 (/sair/reset)
+          </button>
+        </div>
+
+        <div id="resultBox" class="result-box"></div>
+      </form>
+    </div>
+
+    <div class="footer-links">
+      <p>持久化存储将覆盖模块默认参数 · 适用于全客户端<br />
+      <a href="/sair/status" target="_blank">查看原始 JSON 状态 (/sair/status)</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
+    </div>
+  </div>
+
+  <script>
+    function showToast(text, isError) {
+      var toast = document.getElementById("toast");
+      toast.innerText = text;
+      toast.className = "toast show" + (isError ? " error" : "");
+      setTimeout(function() {
+        toast.className = "toast";
+      }, 3000);
+    }
+
+    function togglePassword(e) {
+      var pwd = document.getElementById("api_key");
+      var btn = e.target;
+      if (pwd.type === "password") {
+        pwd.type = "text";
+        btn.innerText = "隐藏";
+      } else {
+        pwd.type = "password";
+        btn.innerText = "显示";
+      }
+    }
+
+    function applyPreset(name) {
+      var ep = document.getElementById("endpoint");
+      var model = document.getElementById("model");
+      if (name === "openai") {
+        ep.value = "https://api.openai.com/v1/chat/completions";
+        model.value = "gpt-4o-mini";
+      } else if (name === "deepseek") {
+        ep.value = "https://api.deepseek.com/v1/chat/completions";
+        model.value = "deepseek-chat";
+      } else if (name === "gemini") {
+        ep.value = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+        model.value = "gemini-2.5-flash";
+      } else if (name === "moonshot") {
+        ep.value = "https://api.moonshot.cn/v1/chat/completions";
+        model.value = "moonshot-v1-8k";
+      } else if (name === "ollama") {
+        ep.value = "http://127.0.0.1:11434/v1/chat/completions";
+        model.value = "llama3.2";
+      }
+      showToast("已填充 " + name + " 预设参数");
+    }
+
+    function saveConfig(e) {
+      e.preventDefault();
+      var btn = document.getElementById("btnSave");
+      btn.disabled = true;
+      btn.innerText = "正在保存并生效...";
+
+      var params = new URLSearchParams();
+      params.append("endpoint", document.getElementById("endpoint").value.trim());
+      params.append("api_key", document.getElementById("api_key").value.trim());
+      params.append("model", document.getElementById("model").value.trim());
+      params.append("notify", document.getElementById("notify").value);
+      params.append("fallback", document.getElementById("fallback").checked ? "true" : "false");
+      params.append("timeout_siri", document.getElementById("timeout_siri").value.trim());
+      params.append("timeout_writing", document.getElementById("timeout_writing").value.trim());
+      params.append("timeout_vision", document.getElementById("timeout_vision").value.trim());
+      params.append("format", "json");
+
+      fetch("/sair/config?" + params.toString())
+        .then(function(resp) { return resp.json(); })
+        .then(function(json) {
+          showToast("✅ 配置保存成功！持久化参数已即时生效");
+        })
+        .catch(function(err) {
+          showToast("⚠️ 保存可能已写入，但刷新状态失败: " + err, true);
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> 保存配置并立即生效';
+        });
+    }
+
+    function probeModels() {
+      var box = document.getElementById("resultBox");
+      box.style.display = "block";
+      box.innerText = "正在探测上游模型列表 (/sair/models)...";
+      fetch("/sair/models")
+        .then(function(resp) { return resp.json(); })
+        .then(function(json) {
+          box.innerText = JSON.stringify(json, null, 2);
+          showToast("模型探测完成！");
+        })
+        .catch(function(err) {
+          box.innerText = "探测失败: " + err;
+          showToast("探测失败，请检查上游接口与 Key", true);
+        });
+    }
+
+    function resetConfig() {
+      if (!confirm("确定要恢复默认配置并清除所有本地持久化参数吗？")) return;
+      fetch("/sair/reset")
+        .then(function(resp) { return resp.json(); })
+        .then(function(json) {
+          showToast("✅ 已恢复默认配置！正在刷新页面...");
+          setTimeout(function() { location.reload(); }, 1000);
+        })
+        .catch(function(err) {
+          showToast("重置失败: " + err, true);
+        });
+    }
+  </script>
+</body>
+</html>`;
 }
 
 // =========================================================================

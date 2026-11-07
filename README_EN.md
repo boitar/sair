@@ -183,24 +183,22 @@ https://github.com/boitar/sair/releases/latest/download/sair.yaml
 
 ### Configure the model gateway
 
-In your client's module/plugin argument editor (or in Surge **Modules → SAIR → Edit Arguments**), enter:
+Every client provides convenient native or visual configuration methods:
 
-```ini
-endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini
+1. **Surge Native Argument Editor**: In **Modules → SAIR → Edit Arguments**, configure `endpoint`, `api_key`, `model`, `notify`, `fallback`, and scenario timeouts directly in Surge's native UI form.
+2. **Loon Native Plugin Card**: In **Configuration → Plugins → SAIR**, Loon displays native card controls with inputs and toggle switches.
+3. **Shadowrocket Native Argument Editor**: In **Config → Modules → SAIR → Edit Arguments**, Shadowrocket parses Surge module arguments natively.
+4. **Universal: Safari Native Liquid Glass Web Control Panel**:
+   With your proxy active, simply open this URL in Safari:
+   ```text
+   https://prod-yabuli.qianwen.com/sair/config
+   ```
+   This serves a self-contained Apple Liquid Glass Web UI featuring quick provider presets (OpenAI, DeepSeek, Gemini, Moonshot, local Ollama), instant persistent storage saving, and an upstream model probe (`/sair/models`). Perfect for Stash, Quantumult X, and Egern without modifying any code.
+
+To reset persistent settings back to defaults, click Reset in the control panel or open:
+```text
+https://prod-yabuli.qianwen.com/sair/reset
 ```
-
-If you provide only a provider's `/v1` base URL, the script appends `/chat/completions` automatically.
-
-> [!TIP]
-> **Universal Safari configuration (recommended for Quantumult X, Stash, and all clients)**:
-> With your proxy running, simply open this URL in Safari to save your settings to persistent storage:
-> ```text
-> https://prod-yabuli.qianwen.com/sair/config?endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini&model=gpt-4o-mini
-> ```
-> To reset persistent settings back to defaults, visit:
-> ```text
-> https://prod-yabuli.qianwen.com/sair/reset
-> ```
 
 ### Verify in Safari
 

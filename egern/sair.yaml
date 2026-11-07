@@ -20,6 +20,9 @@ scriptings:
       model: gpt-4o-mini
       notify: error
       fallback: true
+      timeout_siri: 7
+      timeout_writing: 15
+      timeout_vision: 10
 
   - name: SAIR Inspector Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
@@ -33,6 +36,9 @@ scriptings:
       model: gpt-4o-mini
       notify: error
       fallback: true
+      timeout_siri: 7
+      timeout_writing: 15
+      timeout_vision: 10
 
   - name: SAIR Request
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -46,6 +52,9 @@ scriptings:
       model: gpt-4o-mini
       notify: error
       fallback: true
+      timeout_siri: 7
+      timeout_writing: 15
+      timeout_vision: 10
 
   - name: SAIR Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -59,3 +68,6 @@ scriptings:
       model: gpt-4o-mini
       notify: error
       fallback: true
+      timeout_siri: 7
+      timeout_writing: 15
+      timeout_vision: 10

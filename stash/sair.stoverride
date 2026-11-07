@@ -13,7 +13,7 @@ script:
     require-body: false
     timeout: 15
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
 
   - name: SAIR Inspector Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
@@ -21,7 +21,7 @@ script:
     require-body: false
     timeout: 15
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
 
   - name: SAIR Request
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -30,7 +30,7 @@ script:
     max-size: 16777216
     timeout: 60
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
 
   - name: SAIR Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -39,4 +39,4 @@ script:
     max-size: 16777216
     timeout: 60
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10

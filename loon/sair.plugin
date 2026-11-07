@@ -9,14 +9,14 @@
 #!type = normal
 
 [Argument]
-endpoint = input,"https://api.openai.com/v1/chat/completions",type=string,tag=Endpoint,desc=OpenAI-compatible /v1/chat/completions URL or /v1 base URL
-api_key = input,"",type=string,tag=API Key,desc=Provider API key; leave empty when the endpoint does not require one
-model = input,"gpt-4o-mini",type=string,tag=Model,desc=Upstream model name
-notify = select,error,all,none,type=string,tag=Notifications,desc=error notifies failures; all notifies every stage; none stays silent
-fallback = switch,true,type=boolean,tag=Official fallback,desc=Pass through the official Qwen response on timeout or upstream failure
-timeout_siri = input,7,type=number,tag=Siri timeout,desc=Timeout in seconds for Siri QA
-timeout_writing = input,15,type=number,tag=Writing timeout,desc=Timeout in seconds for Writing Tools
-timeout_vision = input,10,type=number,tag=Vision timeout,desc=Timeout in seconds for Visual Intelligence
+endpoint = input,"https://api.openai.com/v1/chat/completions",tag="Endpoint",desc="OpenAI 兼容的 /v1/chat/completions 接口地址"
+api_key = input,"",tag="API Key",desc="上游 API Key（留空则不附带 Authorization 头）"
+model = input,"gpt-4o-mini",tag="Model",desc="目标模型名称（如 gpt-4o-mini, deepseek-chat, gemini-2.5-flash）"
+notify = select,"error","all","none",tag="Notifications",desc="通知策略：error 仅报错通知，all 全部通知，none 静默"
+fallback = switch,true,tag="Official fallback",desc="上游失败或超时时自动放行回退到官方千问"
+timeout_siri = input,7,tag="Siri timeout",desc="Siri 问答等待超时秒数（推荐 7）"
+timeout_writing = input,15,tag="Writing timeout",desc="写作工具超时秒数（默认 15）"
+timeout_vision = input,10,tag="Vision timeout",desc="视觉智能超时秒数（默认 10）"
 
 [Script]
 request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(?:status|config|models|reset)(?:[/?].*)?$/i then script("https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}}) with tag="SAIR Inspector Request", timeout=15, requires_body=false
