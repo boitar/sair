@@ -373,7 +373,7 @@ function parseUrlQuery(url) {
     if (!key) continue;
     const rawValue = valueParts.join("=").trim();
     try {
-      result[key] = decodeURIComponent(rawValue);
+      result[key] = decodeURIComponent(rawValue.replace(/\+/g, " "));
     } catch (e) {
       result[key] = rawValue;
     }
@@ -809,15 +809,30 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       border-color: var(--input-focus);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
     }
+    .input-wrapper input {
+      padding-right: 68px !important;
+    }
     .toggle-pwd {
       position: absolute;
-      right: 12px;
-      background: none;
-      border: none;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
       color: var(--text-muted);
       cursor: pointer;
       font-size: 12px;
-      padding: 4px;
+      font-weight: 500;
+      padding: 6px 10px;
+      touch-action: manipulation;
+      -webkit-appearance: none;
+      transition: all 0.2s;
+    }
+    .toggle-pwd:active {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text);
     }
     .grid-3 {
       display: grid;
@@ -954,6 +969,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 9999px;
       cursor: pointer;
+      touch-action: manipulation;
       transition: all 0.2s;
     }
     .btn-fetch-models:hover, .btn-fetch-models:active {
@@ -1110,7 +1126,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           <label class="form-label" for="api_key">上游 API Key (Bearer Token)</label>
           <div class="input-wrapper">
             <input type="password" id="api_key" name="api_key" value="${rawKey}" placeholder="sk-..." />
-            <button type="button" class="toggle-pwd" onclick="togglePassword(event)">显示</button>
+            <button type="button" class="toggle-pwd" id="btnTogglePwd" onclick="togglePassword(event)">显示</button>
           </div>
         </div>
 
@@ -1205,7 +1221,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
             保存配置并立即生效
           </button>
-          <button type="button" class="btn btn-secondary" onclick="fetchModelsList(event)">
+          <button type="button" class="btn btn-secondary" id="btnFetchModelsBottom" onclick="fetchModelsList(event)">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             获取并选择上游模型列表 (/sair/models)
           </button>
@@ -1225,6 +1241,19 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
   </div>
 
   <script>
+    window.onerror = function(msg, url, line, col, error) {
+      var box = document.getElementById("resultBox");
+      if (box) {
+        box.style.display = "block";
+        box.innerText = "页面脚本异常 (第 " + line + " 行): " + msg;
+      }
+      showToast("脚本异常: " + msg, true);
+      return false;
+    };
+    if (typeof window !== "undefined" && window.addEventListener) { window.addEventListener("unhandledrejection", function(event) {
+      showToast("异步异常: " + (event.reason ? (event.reason.message || event.reason) : "未知错误"), true);
+    }); }
+
     function showToast(text, isError) {
       var toast = document.getElementById("toast");
       toast.innerText = text;
@@ -1235,14 +1264,19 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     }
 
     function togglePassword(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
       var pwd = document.getElementById("api_key");
-      var btn = e.target;
+      var btn = document.getElementById("btnTogglePwd");
+      if (!pwd) return;
       if (pwd.type === "password") {
         pwd.type = "text";
-        btn.innerText = "隐藏";
+        if (btn) btn.innerText = "隐藏";
       } else {
         pwd.type = "password";
-        btn.innerText = "显示";
+        if (btn) btn.innerText = "显示";
       }
     }
 
@@ -1323,13 +1357,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         });
     }
 
-    function probeModels() {
-      fetchModelsList();
-    }
 
-    function probeModels(e) {
-      fetchModelsList(e);
-    }
 
     function fetchModelsList(e) {
       if (e) {
@@ -1339,6 +1367,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       var ep = document.getElementById("endpoint").value.trim();
       var key = document.getElementById("api_key").value.trim();
       var btn = document.getElementById("btnFetchModels");
+      var btnBottom = document.getElementById("btnFetchModelsBottom");
       var container = document.getElementById("modelSelectContainer");
       var dropdown = document.getElementById("modelDropdown");
       var chipsBox = document.getElementById("modelQuickChips");
@@ -1351,9 +1380,12 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         return false;
       }
 
-      btn.disabled = true;
-      var originalBtnHtml = btn.innerHTML;
-      btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
+      if (btn) btn.disabled = true;
+      if (btnBottom) btnBottom.disabled = true;
+      var originalBtnHtml = btn ? btn.innerHTML : "";
+      var originalBtnBottomHtml = btnBottom ? btnBottom.innerHTML : "";
+      if (btn) btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
+      if (btnBottom) btnBottom.innerText = "⏳ 正在拉取上游模型列表...";
 
       var fetchUrl = "/sair/models?endpoint=" + encodeURIComponent(ep) + "&api_key=" + encodeURIComponent(key) + "&_t=" + Date.now();
 
@@ -1425,16 +1457,22 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           showToast("🎉 成功获取到 " + models.length + " 个模型，请选择！");
 
           box.style.display = "block";
-          box.innerText = "已成功从 " + (res.endpoint || ep) + " 拉取到 " + models.length + " 个模型：\n" + models.join(", ");
+          box.innerText = ["已成功从 " + (res.endpoint || ep) + " 拉取到 " + models.length + " 个模型：", models.join(", ")].join(String.fromCharCode(10));
         })
         .catch(function(err) {
           showToast("拉取失败: " + err.message, true);
           box.style.display = "block";
-          box.innerText = "获取模型列表失败: " + err.message + "\n请检查 Endpoint 与 API Key 是否正确，或服务商是否支持 /models 端点。";
+          box.innerText = ["获取模型列表失败: " + err.message, "请检查 Endpoint 与 API Key 是否正确，或服务商是否支持 /models 端点。"].join(String.fromCharCode(10));
         })
         .finally(function() {
-          btn.disabled = false;
-          btn.innerHTML = originalBtnHtml;
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHtml;
+          }
+          if (btnBottom) {
+            btnBottom.disabled = false;
+            btnBottom.innerHTML = originalBtnBottomHtml;
+          }
         });
     }
 
@@ -1471,6 +1509,22 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+      var toggleBtn = document.getElementById("btnTogglePwd");
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", togglePassword);
+      }
+      var fetchBtn = document.getElementById("btnFetchModels");
+      if (fetchBtn) {
+        fetchBtn.addEventListener("click", fetchModelsList);
+      }
+      var fetchBtnBottom = document.getElementById("btnFetchModelsBottom");
+      if (fetchBtnBottom) {
+        fetchBtnBottom.addEventListener("click", fetchModelsList);
+      }
+      var saveBtn = document.getElementById("btnSave");
+      if (saveBtn) {
+        saveBtn.addEventListener("click", saveConfig);
+      }
       var modelInput = document.getElementById("model");
       if (modelInput) {
         modelInput.addEventListener("input", function() {
