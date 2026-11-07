@@ -121,8 +121,6 @@ GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免
       </td>
       <td>
         <a href="loon/sair.plugin?raw=true">点击一键导入 Loon 插件</a>
-        <br />
-        <sub><a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">使用 Loon 导入页</a></sub>
       </td>
     </tr>
   </tbody>
