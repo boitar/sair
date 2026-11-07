@@ -384,21 +384,23 @@ function parseUrlQuery(url) {
 
 function handleInspectorRoute(url, config) {
   if (!url) return false;
-  if (!url.includes("/sair/")) return false;
+  const isDedicatedHost = url.includes("sair.local") || url.includes("sair.hub") || url.includes("127.0.0.1") || url.includes("localhost");
+  const isSairPath = url.includes("/sair");
+  if (!isDedicatedHost && !isSairPath) return false;
 
   // If this inspector route is being invoked in response phase,
   // the mock response was already constructed and returned in request phase.
   // Pass through safely to prevent duplicate processing or overwriting HTML with JSON.
   if (isResponsePhase()) {
-    if (url.includes("/sair/status") || url.includes("/sair/config") || url.includes("/sair/models") || url.includes("/sair/reset")) {
+    if (isDedicatedHost || isSairPath) {
       if (typeof $done === "function") $done({});
       else if (typeof ctx !== "undefined" && ctx && typeof ctx.done === "function") ctx.done({});
       return true;
     }
   }
 
-  // Route: /sair/models -> fetch models from configured provider
-  if (url.includes("/sair/models")) {
+  // Route: /models -> fetch models from configured provider
+  if (url.includes("/models")) {
     const modelsUrl = config.endpoint.replace(/\/chat\/completions\/?$/, "/models");
     fetchHttp({
       method: "GET",
@@ -427,7 +429,7 @@ function handleInspectorRoute(url, config) {
   }
 
   // Route: /sair/reset -> clear persistent configuration back to module defaults
-  if (url.includes("/sair/reset")) {
+  if (url.includes("/reset")) {
     const keys = [
       "SAIR_ENDPOINT", "SAIR_API_KEY", "SAIR_MODEL", "SAIR_NOTIFY",
       "SAIR_FALLBACK", "SAIR_TIMEOUT_SIRI", "SAIR_TIMEOUT_WRITING", "SAIR_TIMEOUT_VISION",
@@ -450,8 +452,8 @@ function handleInspectorRoute(url, config) {
     return true;
   }
 
-  // Route: /sair/config or /sair/status -> inspect or dynamically update configuration
-  if (url.includes("/sair/config") || url.includes("/sair/status")) {
+  // Route: /config or /status or dedicated host root -> inspect or dynamically update configuration
+  if (url.includes("/config") || url.includes("/status") || isDedicatedHost) {
     let updateNotice = null;
     const query = parseUrlQuery(url);
 
@@ -482,7 +484,7 @@ function handleInspectorRoute(url, config) {
     // Determine output format:
     // Only return JSON if explicit format=json is specified, or hitting /sair/status without HTML Accept header
     const isExplicitJson = query.format === "json";
-    const isStatusOnly = url.includes("/sair/status") && !url.includes("/sair/config");
+    const isStatusOnly = url.includes("/status") && !url.includes("/config") && !isDedicatedHost;
     const isBrowserHtmlRequest = accept.includes("text/html") || query.format === "html";
     const wantsJson = isExplicitJson || (isStatusOnly && !isBrowserHtmlRequest);
 
@@ -916,6 +918,11 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     ${noticeHtml}
 
+    <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:12px;color:#38bdf8;line-height:1.5;">
+      💡 <b>贴心提示</b>：本控制台无需 HTTPS 证书，随时通过浏览器访问 <code>http://sair.local</code> 即可配置。<br />
+      Apple 智能与 Siri 的实际劫持需要 Surge 开启「MITM」并信任 CA 证书。
+    </div>
+
     <div class="card">
       <div class="section-title">快速供应商预设</div>
       <div class="presets-row">
@@ -1029,7 +1036,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     <div class="footer-links">
       <p>持久化存储将覆盖模块默认参数 · 适用于全客户端<br />
-      <a href="/sair/status" target="_blank">查看原始 JSON 状态 (/sair/status)</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
+      本地地址：<a href="http://sair.local">http://sair.local</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
     </div>
   </div>
 
