@@ -453,7 +453,7 @@ function handleInspectorRoute(url, config) {
   }
 
   // Route: /config or /status or dedicated host root -> inspect or dynamically update configuration
-  if (url.includes("/config") || url.includes("/status") || isDedicatedHost) {
+  if (url.includes("/config") || url.includes("/status") || isDedicatedHost || isSairPath) {
     let updateNotice = null;
     const query = parseUrlQuery(url);
 

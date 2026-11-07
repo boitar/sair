@@ -8,9 +8,9 @@
 force-http-engine-hosts = %APPEND% sair.box, *.sair.box, sair.hub, *.sair.hub, sair.ai, *.sair.ai
 
 [Host]
-sair.box = 198.18.0.1
-sair.hub = 198.18.0.1
-sair.ai = 198.18.0.1
+sair.box = 198.18.41.218
+sair.hub = 198.18.41.219
+sair.ai = 198.18.41.220
 
 [MITM]
 hostname = %APPEND% prod-yabuli.qianwen.com, sair.box, *.sair.box, sair.hub, *.sair.hub, sair.ai, *.sair.ai
