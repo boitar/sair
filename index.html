@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SAIR 安装中心 · 客户端快捷导入</title>
+  <link rel="icon" href="https://avatars.githubusercontent.com/u/102434407?s=200&v=4">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(22, 27, 46, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-inner: rgba(13, 17, 30, 0.6);
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --tag-bg: rgba(56, 189, 248, 0.12);
+      --tag-text: #7dd3fc;
+      --tab-active-bg: rgba(255, 255, 255, 0.1);
+      --code-bg: rgba(0, 0, 0, 0.4);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-color: #f8fafc;
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --card-border: rgba(0, 0, 0, 0.06);
+        --card-inner: #f1f5f9;
+        --primary: #0284c7;
+        --primary-hover: #0369a1;
+        --primary-glow: rgba(2, 132, 199, 0.2);
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --tag-bg: rgba(2, 132, 199, 0.1);
+        --tag-text: #0284c7;
+        --tab-active-bg: #ffffff;
+        --code-bg: #e2e8f0;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem 4rem;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      width: 100%;
+      max-width: 680px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--card-inner);
+      padding: 6px;
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1;
+      white-space: nowrap;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tab-btn.active {
+      background: var(--tab-active-bg);
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .meta-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+    }
+    .meta-tag {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      font-weight: 500;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .meta-tag.blue {
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .action-row {
+      margin-bottom: 1.5rem;
+    }
+    .btn-install {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 20px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-install:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-install:active {
+      transform: translateY(1px);
+    }
+    .divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 1.5rem 0;
+    }
+    .info-block {
+      margin-bottom: 1.25rem;
+    }
+    .info-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .info-path {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .code-box {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 42px 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--text);
+      word-break: break-all;
+      user-select: all;
+    }
+    .copy-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .copy-btn:hover { color: var(--text); }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.9);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 100;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">SAIR v1.0.0 · Apple Intelligence Router</div>
+    <h1>客户端安装链接</h1>
+    <p class="subtitle">点击下方一键安装直接唤醒客户端，或复制链接手动导入</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="surge">Surge</button>
+      <button class="tab-btn" data-tab="loon">Loon</button>
+      <button class="tab-btn" data-tab="stash">Stash</button>
+      <button class="tab-btn" data-tab="egern">Egern</button>
+      <button class="tab-btn" data-tab="qx">Quantumult X</button>
+      <button class="tab-btn" data-tab="sr">Shadowrocket</button>
+    </div>
+
+    <!-- Surge -->
+    <div class="tab-pane active" id="pane-surge">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">Dual-Hook 脚本</span>
+        <span class="meta-tag blue">16MB 大包缓冲</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Surge 模块
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">首页 &gt; 修改 &gt; 模块 &gt; 安装新模块</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.sgmodule</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loon -->
+    <div class="tab-pane" id="pane-loon">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">Plugin 原生插件</span>
+        <span class="meta-tag blue">表单参数配置</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Loon 插件
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">配置 &gt; 插件 &gt; 插件 (右上角添加)</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.plugin</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.plugin')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stash -->
+    <div class="tab-pane" id="pane-stash">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">Override 覆写规则</span>
+        <span class="meta-tag blue">大请求体多模态</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Stash 覆写
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">首页 &gt; 覆写 &gt; 安装覆写</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.stoverride</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.stoverride')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Egern -->
+    <div class="tab-pane" id="pane-egern">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">YAML 模块规范</span>
+        <span class="meta-tag blue">ctx 上下文适配</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Egern 模块
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">工具 &gt; 模块 &gt; 从 URL 添加模块</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.yaml</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.yaml')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantumult X -->
+    <div class="tab-pane" id="pane-qx">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">Snippet 远程重写</span>
+        <span class="meta-tag blue">Safari 传参持久化</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.snippet%22%5D%7D">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Quantumult X Snippet
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">重写 &gt; 引用 (右上角加号添加远程资源)</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.snippet</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.snippet')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shadowrocket -->
+    <div class="tab-pane" id="pane-sr">
+      <div class="meta-tags">
+        <span class="meta-tag">MitM</span>
+        <span class="meta-tag blue">Module 模块规范</span>
+        <span class="meta-tag blue">参数编辑面板</span>
+      </div>
+      <div class="action-row">
+        <div class="section-title">一键安装</div>
+        <a class="btn-install" href="shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M4 18v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          点击一键安装 Shadowrocket 模块
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="info-block">
+        <div class="info-label">手动安装路径</div>
+        <div class="info-path">配置 &gt; 模块 &gt; 右上角加号从 URL 安装</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release 直链地址 (推荐)</div>
+        <div class="code-box">
+          <span>https://github.com/boitar/sair/releases/latest/download/sair.sgmodule</span>
+          <button class="copy-btn" onclick="copyText('https://github.com/boitar/sair/releases/latest/download/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">GitHub Raw 备用地址</div>
+        <div class="code-box">
+          <span>https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule</span>
+          <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>返回 GitHub 仓库文档：<a href="https://github.com/boitar/sair">boitar/sair</a> · MIT License</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panes = document.querySelectorAll('.tab-pane');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panes.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById('pane-' + btn.dataset.tab);
+      if (target) target.classList.add('active');
+    });
+  });
+
+  function copyText(str) {
+    navigator.clipboard.writeText(str).then(() => {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  }
+</script>
+</body>
+</html>

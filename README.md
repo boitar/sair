@@ -5,12 +5,12 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#环境要求)
-[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
-[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
-[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true)
-[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true)
-[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true)
-[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true)
+[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](#手动安装-surge-模块)
+[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](#手动安装-loon-插件)
+[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](#手动安装-stash-覆写)
+[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](#手动安装-shadowrocket-模块)
+[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](#手动安装-quantumult-x-snippet)
+[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](#手动安装-egern-模块)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#主流服务商配置示例)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
@@ -102,101 +102,84 @@ sequenceDiagram
 
 ### 一键安装
 
-这是推荐的安装方式。
+> [!TIP]
+> 🚀 **[点击打开 Web 在线安装中心（支持 Safari 一键唤醒导入各客户端）](https://boitar.github.io/sair/)**
+> 在 iOS Safari 中访问该页面，点击一键安装即可无缝调起 Surge、Loon、Stash、Egern、Quantumult X 与 Shadowrocket 自动导入配置。
 
-下面的入口用于打开对应客户端的导入流程。导入完成后仍需在模块 / 插件参数中填写
-上游地址和 API Key，并按客户端要求开启 MITM 和证书信任。
+你也可以直接使用各客户端专属的 **一键安装快捷 URL Scheme**（在 Safari、快捷指令或支持自定义 Scheme 的应用中触发）：
 
-一键导入使用仓库内的模块 / 插件文件；模块和插件运行时引用的适配脚本固定使用 `main` 地址。
-
-GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免自定义协议被页面过滤。
-
-<table>
-  <thead>
-    <tr>
-      <th>Surge</th>
-      <th>Loon</th>
-      <th>Stash</th>
-      <th>Shadowrocket</th>
-      <th>Quantumult X</th>
-      <th>Egern</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">导入 Surge 模块</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">导入 Loon 插件</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true">导入 Stash 覆写</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true">导入 Shadowrocket 模块</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true">导入 QX Snippet</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true">导入 Egern 模块</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+| 客户端 | 快捷安装入口 (URL Scheme) | 手动直链下载 (GitHub Release) |
+| :--- | :--- | :--- |
+| **Surge** | [点击一键安装 Surge 模块](surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
+| **Loon** | [点击一键安装 Loon 插件](loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin` | [`sair.plugin`](https://github.com/boitar/sair/releases/latest/download/sair.plugin) |
+| **Stash** | [点击一键安装 Stash 覆写](stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride` | [`sair.stoverride`](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) |
+| **Egern** | [点击一键安装 Egern 模块](egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml` | [`sair.yaml`](https://github.com/boitar/sair/releases/latest/download/sair.yaml) |
+| **Quantumult X** | [点击一键安装 QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://github.com/boitar/sair/releases/latest/download/sair.snippet"]}` | [`sair.snippet`](https://github.com/boitar/sair/releases/latest/download/sair.snippet) |
+| **Shadowrocket** | [点击一键安装 Shadowrocket 模块](shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
 
 ### 手动安装 Surge 模块
 
-如果一键链接没有直接交给 Surge，也可以在 Surge iOS 中打开 **模块 → 安装新模块**，填入：
+**安装路径**：`首页 > 修改 > 模块 > 安装新模块`（或 `配置 > 模块 > 安装新模块`）
 
+**模块下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
+https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule`)*
 
 模块会自动追加 MITM 主机名，并注册 SAIR 的请求与响应双阶段脚本。
 
 ### 手动安装 Loon 插件
 
-如果一键链接没有唤起 Loon，在 Loon 中打开 **插件 → 添加插件**，填入：
+**安装路径**：`配置 > 插件 > 插件`（右上角加号）
 
+**插件下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
+https://github.com/boitar/sair/releases/latest/download/sair.plugin
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin`)*
 
 启用插件后，Loon 会显示 SAIR 的可调参数。
 
 ### 手动安装 Stash 覆写
 
-在 Stash 中打开 **覆写 (Override) → 从 URL 下载**，填入：
+**安装路径**：`首页 > 覆写 > 安装覆写`（或 `覆写 > 从 URL 下载`）
 
+**覆写下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride
+https://github.com/boitar/sair/releases/latest/download/sair.stoverride
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride`)*
 
 ### 手动安装 Shadowrocket 模块
 
-在 Shadowrocket 中打开 **配置 → 模块 → 从 URL 安装**，填入：
+**安装路径**：`配置 > 模块 > 右上角加号`
 
+**模块下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule
+https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule`)*
 
 ### 手动安装 Quantumult X Snippet
 
-在 Quantumult X 中打开 **配置文件 → 编辑 → [rewrite_local] 与 [mitm]**，或在 **重写 → 引用 (Remote)** 中添加引用：
+**安装路径**：`重写 > 引用`（右上角加号添加远程资源）
 
+**Snippet 下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet
+https://github.com/boitar/sair/releases/latest/download/sair.snippet
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet`)*
 
 ### 手动安装 Egern 模块
 
-在 Egern 中打开 **Modules → Add Module from URL**，填入：
+**安装路径**：`工具 > 模块`（右上角添加 / Add Module from URL）
 
+**模块下载地址 (推荐 Release 直链)**：
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml
+https://github.com/boitar/sair/releases/latest/download/sair.yaml
 ```
+*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml`)*
 
 ### 配置模型网关
 
@@ -306,12 +289,12 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | 客户端 | 状态 | 导入入口 | 说明 |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ 完整支持 | [导入模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 官方推荐主客户端，支持请求 / 响应双阶段拦截、参数编辑和 16MB 大请求体缓存。 |
-| **Loon** | ✅ 完整支持 | [导入插件](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | 专用插件定义，原生表单参数可视化配置，新版 Script 语法双阶段拦截。 |
-| **Stash** | ✅ 完整适配 | [导入覆写](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true) | 专用 `.stoverride` 规则覆盖，支持参数传递与 16MB 大请求体多模态图片。 |
-| **Shadowrocket** | ✅ 完整适配 | [导入模块](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true) | 专用模块配置，完全兼容 Surge 模块规范与参数配置。 |
-| **Quantumult X** | ✅ 完整适配 | [导入 Snippet](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true) | 专用 `.snippet` 重写，内置兼容层适配 `$task.fetch` / `$prefs`，支持 Safari 动态传参。 |
-| **Egern** | ✅ 完整适配 | [导入模块](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true) | 专用 YAML 模块定义，适配 `ctx` 对象模型与持久化存储。 |
+| **Surge** | ✅ 完整支持 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) | 官方推荐主客户端，支持请求 / 响应双阶段拦截、参数编辑和 16MB 大请求体缓存。 |
+| **Loon** | ✅ 完整支持 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.plugin) | 专用插件定义，原生表单参数可视化配置，新版 Script 语法双阶段拦截。 |
+| **Stash** | ✅ 完整适配 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) | 专用 `.stoverride` 规则覆盖，支持参数传递与 16MB 大请求体多模态图片。 |
+| **Shadowrocket** | ✅ 完整适配 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) | 专用模块配置，完全兼容 Surge 模块规范与参数配置。 |
+| **Quantumult X** | ✅ 完整适配 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.snippet) | 专用 `.snippet` 重写，内置兼容层适配 `$task.fetch` / `$prefs`，支持 Safari 动态传参。 |
+| **Egern** | ✅ 完整适配 | [一键安装](#一键安装) · [直链下载](https://github.com/boitar/sair/releases/latest/download/sair.yaml) | 专用 YAML 模块定义，适配 `ctx` 对象模型与持久化存储。 |
 
 - SAIR 已提供覆盖 6 大主流客户端的专用配置文件，由同一定制的跨平台适配脚本 [`scripts/sair_adapter.js`](scripts/sair_adapter.js) 统一驱动。
 - 在未提供图形化模块参数编辑面板的客户端（如 Quantumult X），可在 Safari 中访问 `/sair/config?...` 动态保存与生效配置。
@@ -342,6 +325,7 @@ SAIR/
 │   └── sair.snippet            # Quantumult X 重写片段
 ├── egern/
 │   └── sair.yaml               # Egern 模块定义
+├── index.html                  # Web 在线一键安装中心 (GitHub Pages)
 ├── LICENSE                     # MIT 开源许可证
 ├── README.md                   # 中文主文档
 └── README_EN.md                # English documentation
