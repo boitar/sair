@@ -123,8 +123,6 @@ Using repository-relative HTTPS links keeps the entries clickable in GitHub-rend
       </td>
       <td>
         <a href="loon/sair.plugin?raw=true">Import the Loon plugin</a>
-        <br />
-        <sub><a href="https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Fcustom%2Floon%2Fsair.plugin">Use the Loon import page</a></sub>
       </td>
     </tr>
   </tbody>
