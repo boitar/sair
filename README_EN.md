@@ -5,8 +5,8 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#prerequisites)
-[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](sgmodule/sair.sgmodule)
-[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](loon/sair.plugin)
+[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
+[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#provider-configuration-examples)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
@@ -119,10 +119,10 @@ Using repository-relative HTTPS links keeps the entries clickable in GitHub-rend
   <tbody>
     <tr>
       <td>
-        <a href="sgmodule/sair.sgmodule?raw=true">Import the Surge module</a>
+        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">Import the Surge module</a>
       </td>
       <td>
-        <a href="loon/sair.plugin?raw=true">Import the Loon plugin</a>
+        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">Import the Loon plugin</a>
       </td>
     </tr>
   </tbody>
@@ -133,7 +133,7 @@ Using repository-relative HTTPS links keeps the entries clickable in GitHub-rend
 If the one-click link does not hand the file to Surge, open **Modules → Install New Module** in Surge iOS and enter:
 
 ```text
-https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
+https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
 ```
 
 The module adds the MITM hostname and registers SAIR's request and response hooks automatically.
@@ -143,7 +143,7 @@ The module adds the MITM hostname and registers SAIR's request and response hook
 If the one-click link does not open Loon, open **Plugins → Add Plugin** in Loon and enter:
 
 ```text
-https://raw.githubusercontent.com/boitar/sair/custom/loon/sair.plugin
+https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
 ```
 
 After enabling it, Loon will show the configurable SAIR arguments.
@@ -250,9 +250,9 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | Client | Status | Import entry | Notes |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ Full | [Import module](sgmodule/sair.sgmodule?raw=true) | Primary validation client with complete request / response hooks and arguments. |
-| **Loon** | ✅ Full | [Import plugin](loon/sair.plugin?raw=true) | Dedicated plugin definition with object arguments and dual-phase scripts. |
-| **Stash** | ◐ Partial | [Try the Surge module](sgmodule/sair.sgmodule?raw=true) | Its script APIs are close to Surge, but SAIR has not been device-validated there, including large request bodies and lifecycle behavior. |
+| **Surge** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Primary validation client with complete request / response hooks and arguments. |
+| **Loon** | ✅ Full | [Import plugin](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | Dedicated plugin definition with object arguments and dual-phase scripts. |
+| **Stash** | ◐ Partial | [Try the Surge module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Its script APIs are close to Surge, but SAIR has not been device-validated there, including large request bodies and lifecycle behavior. |
 | **Shadowrocket** | ◐ Partial | — | Supports request / response scripting, but has no SAIR-specific configuration or full acceptance test. |
 | **Quantumult X** | ❌ Not supported | — | Uses different script APIs such as `$task.fetch` and `$prefs`; it needs a dedicated adapter. |
 | **Egern** | ❌ Not supported | — | Uses the `ctx` object and a separate script configuration format, so the current adapter cannot run directly. |

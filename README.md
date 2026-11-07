@@ -5,8 +5,8 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#环境要求)
-[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](sgmodule/sair.sgmodule)
-[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](loon/sair.plugin)
+[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
+[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#主流服务商配置示例)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
@@ -117,10 +117,10 @@ GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免
   <tbody>
     <tr>
       <td>
-        <a href="sgmodule/sair.sgmodule?raw=true">点击一键导入 Surge 模块</a>
+        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">点击一键导入 Surge 模块</a>
       </td>
       <td>
-        <a href="loon/sair.plugin?raw=true">点击一键导入 Loon 插件</a>
+        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">点击一键导入 Loon 插件</a>
       </td>
     </tr>
   </tbody>
@@ -131,7 +131,7 @@ GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免
 如果一键链接没有直接交给 Surge，也可以在 Surge iOS 中打开 **模块 → 安装新模块**，填入：
 
 ```text
-https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
+https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
 ```
 
 模块会自动追加 MITM 主机名，并注册 SAIR 的请求与响应双阶段脚本。
@@ -141,7 +141,7 @@ https://raw.githubusercontent.com/boitar/sair/custom/sgmodule/sair.sgmodule
 如果一键链接没有唤起 Loon，在 Loon 中打开 **插件 → 添加插件**，填入：
 
 ```text
-https://raw.githubusercontent.com/boitar/sair/custom/loon/sair.plugin
+https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
 ```
 
 启用插件后，Loon 会显示 SAIR 的可调参数。
@@ -247,9 +247,9 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | 客户端 | 状态 | 导入入口 | 说明 |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ 完整支持 | [导入模块](sgmodule/sair.sgmodule?raw=true) | 当前主验证客户端，支持请求 / 响应双阶段和完整参数配置。 |
-| **Loon** | ✅ 完整支持 | [导入插件](loon/sair.plugin?raw=true) | 使用独立插件定义，参数对象和双阶段脚本已适配。 |
-| **Stash** | ◐ 部分支持 | [尝试导入 Surge 模块](sgmodule/sair.sgmodule?raw=true) | 脚本 API 接近 Surge，但当前没有 SAIR 的实机验收，不能保证模块生命周期和大请求体行为。 |
+| **Surge** | ✅ 完整支持 | [导入模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 当前主验证客户端，支持请求 / 响应双阶段和完整参数配置。 |
+| **Loon** | ✅ 完整支持 | [导入插件](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | 使用独立插件定义，参数对象和双阶段脚本已适配。 |
+| **Stash** | ◐ 部分支持 | [尝试导入 Surge 模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 脚本 API 接近 Surge，但当前没有 SAIR 的实机验收，不能保证模块生命周期和大请求体行为。 |
 | **Shadowrocket** | ◐ 部分支持 | — | 支持请求 / 响应脚本，但没有 SAIR 专用配置和完整验收，需自行调整规则并测试。 |
 | **Quantumult X** | ❌ 暂不支持 | — | 使用 `$task.fetch`、`$prefs` 等不同脚本 API，需要单独编写适配器。 |
 | **Egern** | ❌ 暂不支持 | — | 使用 `ctx` 对象和独立脚本配置格式，不能直接运行当前适配器。 |
