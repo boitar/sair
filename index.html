@@ -297,6 +297,7 @@
         <span class="meta-tag">MitM</span>
         <span class="meta-tag blue">Dual-Hook 脚本</span>
         <span class="meta-tag blue">16MB 大包缓冲</span>
+        <span class="meta-tag blue">原生参数调节</span>
       </div>
       <div class="action-row">
         <div class="section-title">一键安装</div>
@@ -323,6 +324,10 @@
           <span>https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule</span>
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">参数调节方式</div>
+        <div class="info-path">Surge 首页 &gt; 模块 &gt; SAIR &gt; <b>编辑参数</b>，可直接使用原生表单配置 endpoint、api_key、model 等参数；亦可在代理启动后在 Safari 打开 <code>https://prod-yabuli.qianwen.com/sair/config</code> 进行可视化调节。</div>
       </div>
     </div>
 
@@ -359,6 +364,10 @@
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
       </div>
+      <div class="info-block">
+        <div class="info-label">参数调节方式</div>
+        <div class="info-path">Loon 配置 &gt; 插件 &gt; 点击 SAIR 插件详情，拥有 Loon 原生表单卡片，可直接调整上游模型、超时与回退开关。</div>
+      </div>
     </div>
 
     <!-- Stash -->
@@ -393,6 +402,10 @@
           <span>https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride</span>
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">快捷参数配置 (推荐)</div>
+        <div class="info-path">启动代理后，在 Safari 打开 <b><a href="https://prod-yabuli.qianwen.com/sair/config" target="_blank" style="color:#38bdf8;text-decoration:none;">https://prod-yabuli.qianwen.com/sair/config</a></b>，即可通过自包含的 Apple Liquid Glass 风格控制台一键修改与测试！</div>
       </div>
     </div>
 
@@ -429,6 +442,10 @@
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
       </div>
+      <div class="info-block">
+        <div class="info-label">快捷参数配置 (推荐)</div>
+        <div class="info-path">启动代理后，在 Safari 打开 <b><a href="https://prod-yabuli.qianwen.com/sair/config" target="_blank" style="color:#38bdf8;text-decoration:none;">https://prod-yabuli.qianwen.com/sair/config</a></b>，即可通过自包含的控制台修改参数并写入 <code>ctx.storage</code>。</div>
+      </div>
     </div>
 
     <!-- Quantumult X -->
@@ -463,6 +480,10 @@
           <span>https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet</span>
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">快捷参数配置 (推荐)</div>
+        <div class="info-path">启动代理后，在 Safari 打开 <b><a href="https://prod-yabuli.qianwen.com/sair/config" target="_blank" style="color:#38bdf8;text-decoration:none;">https://prod-yabuli.qianwen.com/sair/config</a></b>，即可通过自包含的控制台修改参数并写入 <code>$prefs</code>。</div>
       </div>
     </div>
 
@@ -499,7 +520,33 @@
           <button class="copy-btn" onclick="copyText('https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg></button>
         </div>
       </div>
+      <div class="info-block">
+        <div class="info-label">参数调节方式</div>
+        <div class="info-path">Shadowrocket 配置 &gt; 模块 &gt; 点击 SAIR &gt; <b>编辑参数</b>，可直接使用原生表单配置；亦可在 Safari 打开 <code>https://prod-yabuli.qianwen.com/sair/config</code> 进行可视化调节。</div>
+      </div>
     </div>
+  </div>
+
+  <!-- Safari Control Console Card -->
+  <div class="card" style="margin-top: 20px;">
+    <div class="section-title">
+      <span class="meta-tag blue">全客户端通用</span>
+      <span>Safari 原生可视化参数控制台</span>
+    </div>
+    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-top: 8px;">
+      无论使用 Surge、Loon、Stash、Shadowrocket、Quantumult X 还是 Egern，只要启动对应客户端的代理与 MITM 后，直接在 Safari 访问：
+    </p>
+    <div class="code-box" style="margin: 12px 0;">
+      <span>https://prod-yabuli.qianwen.com/sair/config</span>
+      <button class="copy-btn" onclick="copyText('https://prod-yabuli.qianwen.com/sair/config')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+      </button>
+    </div>
+    <ul style="font-size: 12px; color: var(--text-muted); padding-left: 18px; margin: 0; line-height: 1.7;">
+      <li><b>一键预设</b>：支持 OpenAI、DeepSeek、Gemini、Moonshot、Ollama 快速填充。</li>
+      <li><b>即时持久化</b>：点击保存立即写入客户端持久化存储（$persistentStore / $prefs / ctx.storage），优先于默认参数生效。</li>
+      <li><b>探针测试</b>：内置上游连通性与模型列表探测（/sair/models）。</li>
+    </ul>
   </div>
 
   <div class="footer">
