@@ -1,5 +1,5 @@
 #!name = SAIR - Siri-ously AI Router
-#!desc = Route Mainland China Apple Intelligence requests to an OpenAI-compatible provider through Loon.
+#!desc = 国行 Apple 智能大模型重写插件：通过 Loon 本地脚本重写将写作工具、Siri 问答与视觉智能转接至自定义大模型，支持原生参数调节与 Web 控制台。
 #!author = boitar
 #!homepage = https://github.com/boitar/sair
 #!system = iOS,iPadOS

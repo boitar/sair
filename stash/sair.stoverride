@@ -1,5 +1,5 @@
 name: SAIR - Siri-ously AI Router
-desc: Route Apple Intelligence (iOS 27.3+) requests to your preferred LLM providers (OpenAI / Gemini / Claude / DeepSeek / Self-hosted) through Stash. Supports Writing Tools, Siri QA, and Visual Intelligence.
+desc: 国行 Apple 智能大模型重写覆写规则：通过 Stash 规则覆写与双阶段脚本，将写作工具、Siri 问答与视觉智能透明重写为自定义大模型。
 author: boitar
 homepage: https://github.com/boitar/sair
 

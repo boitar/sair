@@ -60,7 +60,7 @@
     <text x="72" y="174" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-size="92" font-weight="800" letter-spacing="-4">SAIR</text>
     <text x="78" y="216" fill="#F9A8D4" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-size="25" font-weight="600">Siri-ously AI Router</text>
     <rect x="78" y="232" width="238" height="3" rx="1.5" fill="url(#spectrum)" />
-    <text x="78" y="270" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="16" font-weight="500">把系统级智能，路由到你选择的模型</text>
+    <text x="78" y="270" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="16" font-weight="500">把系统级智能，重写为你选择的模型</text>
     <text x="78" y="298" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="13">China Mainland Apple Intelligence · iOS 27.3+</text>
 
     <g transform="translate(78 338)">
