@@ -1254,6 +1254,13 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       showToast("异步异常: " + (event.reason ? (event.reason.message || event.reason) : "未知错误"), true);
     }); }
 
+    var BTN_FETCH_DEFAULT_HTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 获取所有模型';
+    var BTN_FETCH_BOTTOM_DEFAULT_HTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 获取并选择上游模型列表 (/sair/models)';
+    var BTN_SAVE_DEFAULT_HTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> 保存配置并立即生效';
+    var isFetchingModels = false;
+    var isSavingConfig = false;
+    var lastToggleTime = 0;
+
     function showToast(text, isError) {
       var toast = document.getElementById("toast");
       toast.innerText = text;
@@ -1268,6 +1275,10 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         if (e.preventDefault) e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
       }
+      var now = Date.now();
+      if (now - lastToggleTime < 250) return;
+      lastToggleTime = now;
+
       var pwd = document.getElementById("api_key");
       var btn = document.getElementById("btnTogglePwd");
       if (!pwd) return;
@@ -1323,12 +1334,17 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     function saveConfig(e) {
       if (e) {
-        e.preventDefault();
+        if (e.preventDefault) e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
       }
+      if (isSavingConfig) return;
+      isSavingConfig = true;
+
       var btn = document.getElementById("btnSave");
-      btn.disabled = true;
-      btn.innerText = "正在保存并生效...";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "正在保存并生效...";
+      }
 
       var params = new URLSearchParams();
       params.append("endpoint", document.getElementById("endpoint").value.trim());
@@ -1352,8 +1368,11 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           showToast("⚠️ 保存可能已写入，但刷新状态失败: " + err, true);
         })
         .finally(function() {
-          btn.disabled = false;
-          btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> 保存配置并立即生效';
+          isSavingConfig = false;
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = BTN_SAVE_DEFAULT_HTML;
+          }
         });
     }
 
@@ -1361,9 +1380,11 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     function fetchModelsList(e) {
       if (e) {
-        e.preventDefault();
+        if (e.preventDefault) e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
       }
+      if (isFetchingModels) return;
+
       var ep = document.getElementById("endpoint").value.trim();
       var key = document.getElementById("api_key").value.trim();
       var btn = document.getElementById("btnFetchModels");
@@ -1380,12 +1401,15 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         return false;
       }
 
-      if (btn) btn.disabled = true;
-      if (btnBottom) btnBottom.disabled = true;
-      var originalBtnHtml = btn ? btn.innerHTML : "";
-      var originalBtnBottomHtml = btnBottom ? btnBottom.innerHTML : "";
-      if (btn) btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
-      if (btnBottom) btnBottom.innerText = "⏳ 正在拉取上游模型列表...";
+      isFetchingModels = true;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
+      }
+      if (btnBottom) {
+        btnBottom.disabled = true;
+        btnBottom.innerText = "⏳ 正在拉取上游模型列表...";
+      }
 
       var fetchUrl = "/sair/models?endpoint=" + encodeURIComponent(ep) + "&api_key=" + encodeURIComponent(key) + "&_t=" + Date.now();
 
@@ -1465,13 +1489,14 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           box.innerText = ["获取模型列表失败: " + err.message, "请检查 Endpoint 与 API Key 是否正确，或服务商是否支持 /models 端点。"].join(String.fromCharCode(10));
         })
         .finally(function() {
+          isFetchingModels = false;
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = originalBtnHtml;
+            btn.innerHTML = BTN_FETCH_DEFAULT_HTML;
           }
           if (btnBottom) {
             btnBottom.disabled = false;
-            btnBottom.innerHTML = originalBtnBottomHtml;
+            btnBottom.innerHTML = BTN_FETCH_BOTTOM_DEFAULT_HTML;
           }
         });
     }
@@ -1509,22 +1534,6 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-      var toggleBtn = document.getElementById("btnTogglePwd");
-      if (toggleBtn) {
-        toggleBtn.addEventListener("click", togglePassword);
-      }
-      var fetchBtn = document.getElementById("btnFetchModels");
-      if (fetchBtn) {
-        fetchBtn.addEventListener("click", fetchModelsList);
-      }
-      var fetchBtnBottom = document.getElementById("btnFetchModelsBottom");
-      if (fetchBtnBottom) {
-        fetchBtnBottom.addEventListener("click", fetchModelsList);
-      }
-      var saveBtn = document.getElementById("btnSave");
-      if (saveBtn) {
-        saveBtn.addEventListener("click", saveConfig);
-      }
       var modelInput = document.getElementById("model");
       if (modelInput) {
         modelInput.addEventListener("input", function() {
