@@ -1,0 +1,42 @@
+name: SAIR - Siri-ously AI Router
+desc: Route Apple Intelligence (iOS 27.3+) requests to your preferred LLM providers (OpenAI / Gemini / Claude / DeepSeek / Self-hosted) through Stash. Supports Writing Tools, Siri QA, and Visual Intelligence.
+author: boitar
+homepage: https://github.com/boitar/sair
+
+mitm:
+  - "prod-yabuli.qianwen.com"
+
+script:
+  - name: SAIR Inspector Request
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+    type: request
+    require-body: false
+    timeout: 15
+    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+
+  - name: SAIR Inspector Response
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+    type: response
+    require-body: false
+    timeout: 15
+    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+
+  - name: SAIR Request
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
+    type: request
+    require-body: true
+    max-size: 16777216
+    timeout: 60
+    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true
+
+  - name: SAIR Response
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
+    type: response
+    require-body: true
+    max-size: 16777216
+    timeout: 60
+    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true

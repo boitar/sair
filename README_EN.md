@@ -5,15 +5,19 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#prerequisites)
-[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
+[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
 [![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
+[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true)
+[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true)
+[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true)
+[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#provider-configuration-examples)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
 
 <p align="center">
   <b>Your Intelligence. Your Models.</b><br />
-  A lightweight, zero-dependency model router for Mainland China Apple Intelligence (iOS 27.3+) powered by Surge and Loon.
+  A lightweight, zero-dependency model router for Mainland China Apple Intelligence (iOS 27.3+) across major iOS proxy clients.
 </p>
 
 <p align="center">
@@ -36,7 +40,7 @@
 
 ## Overview
 
-**Apple Intelligence** extensions in Mainland China connect directly from the device to Alibaba's Qwen gateway (`prod-yabuli.qianwen.com`) over standard TLS 1.3. SAIR uses Surge or Loon `http-request` and `http-response` hooks to transparently intercept the flow, dispatch the prompt to a custom model gateway, and rewrite the returned SSE payload on-device.
+**Apple Intelligence** extensions in Mainland China connect directly from the device to Alibaba's Qwen gateway (`prod-yabuli.qianwen.com`) over standard TLS 1.3. SAIR uses Surge, Loon, Stash, Shadowrocket, Quantumult X, or Egern dual-phase hooks and rewrites to transparently intercept the flow, dispatch the prompt to a custom model gateway, and rewrite the returned SSE payload on-device.
 
 The native **Writing Tools**, **Siri QA**, and **Visual Intelligence** entry points remain unchanged. The underlying model can be switched to any provider compatible with OpenAI `/v1/chat/completions`, including OpenAI, Gemini, Claude, DeepSeek, OpenRouter, or self-hosted Ollama / vLLM gateways.
 
@@ -92,7 +96,7 @@ See [`docs/protocol_analysis.md`](docs/protocol_analysis.md) for the complete to
 ### Prerequisites
 
 1. **Device and OS**: An iPhone or iPad running iOS 27.3+ with Mainland China Apple Intelligence enabled.
-2. **Proxy client**: Surge iOS 5.x+ with **MITM**, **Rewrite**, and **Scripting** enabled, or Loon 3.5.1 (983)+.
+2. **Proxy client**: Surge iOS 5.x+, Loon 3.5.1+, Stash 2.5+, Shadowrocket, Quantumult X 1.0.30+, or Egern with **MITM** and **Scripting/Rewrite** enabled.
 3. **Certificate trust**: Fully trust the selected client's MITM CA certificate under *Settings → General → About → Certificate Trust Settings*.
 4. **Provider credentials**: An upstream service and API key compatible with OpenAI `/v1/chat/completions`.
 
@@ -114,6 +118,10 @@ Using repository-relative HTTPS links keeps the entries clickable in GitHub-rend
     <tr>
       <th>Surge</th>
       <th>Loon</th>
+      <th>Stash</th>
+      <th>Shadowrocket</th>
+      <th>Quantumult X</th>
+      <th>Egern</th>
     </tr>
   </thead>
   <tbody>
@@ -124,13 +132,25 @@ Using repository-relative HTTPS links keeps the entries clickable in GitHub-rend
       <td>
         <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">Import the Loon plugin</a>
       </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true">Import Stash override</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true">Import Shadowrocket module</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true">Import QX snippet</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true">Import Egern module</a>
+      </td>
     </tr>
   </tbody>
 </table>
 
 ### Manual Surge module installation
 
-If the one-click link does not hand the file to Surge, open **Modules → Install New Module** in Surge iOS and enter:
+Open **Modules → Install New Module** in Surge iOS and enter:
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
@@ -140,7 +160,7 @@ The module adds the MITM hostname and registers SAIR's request and response hook
 
 ### Manual Loon plugin installation
 
-If the one-click link does not open Loon, open **Plugins → Add Plugin** in Loon and enter:
+Open **Plugins → Add Plugin** in Loon and enter:
 
 ```text
 https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
@@ -148,9 +168,41 @@ https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
 
 After enabling it, Loon will show the configurable SAIR arguments.
 
+### Manual Stash override installation
+
+In Stash, go to **Overrides → Download from URL** and enter:
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride
+```
+
+### Manual Shadowrocket module installation
+
+In Shadowrocket, navigate to **Config → Modules → Install from URL** and enter:
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule
+```
+
+### Manual Quantumult X snippet installation
+
+In Quantumult X, add the snippet under **Rewrite → Remote Resources** or paste it into your local configuration:
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet
+```
+
+### Manual Egern module installation
+
+In Egern, open **Modules → Add Module from URL** and enter:
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml
+```
+
 ### Configure the model gateway
 
-In **Modules → SAIR → Edit Arguments** in Surge, or in the SAIR plugin argument panel in Loon, enter your provider endpoint and API key:
+In your client's module/plugin argument editor (or in Surge **Modules → SAIR → Edit Arguments**), enter:
 
 ```ini
 endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini
@@ -158,10 +210,16 @@ endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&mode
 
 If you provide only a provider's `/v1` base URL, the script appends `/chat/completions` automatically.
 
-The Loon plugin registers the shared [`scripts/sair_adapter.js`](scripts/sair_adapter.js) for both
-request and response phases and appends `prod-yabuli.qianwen.com` to the MITM hostname list. `notify`,
-`fallback`, and the three scenario timeouts are also configurable there; the script accepts both
-Loon's argument object and Surge's `key=value` argument string.
+> [!TIP]
+> **Universal Safari configuration (recommended for Quantumult X, Stash, and all clients)**:
+> With your proxy running, simply open this URL in Safari to save your settings to persistent storage:
+> ```text
+> https://prod-yabuli.qianwen.com/sair/config?endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini&model=gpt-4o-mini
+> ```
+> To reset persistent settings back to defaults, visit:
+> ```text
+> https://prod-yabuli.qianwen.com/sair/reset
+> ```
 
 ### Verify in Safari
 
@@ -250,15 +308,15 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | Client | Status | Import entry | Notes |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Primary validation client with complete request / response hooks and arguments. |
-| **Loon** | ✅ Full | [Import plugin](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | Dedicated plugin definition with object arguments and dual-phase scripts. |
-| **Stash** | ◐ Partial | [Try the Surge module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Its script APIs are close to Surge, but SAIR has not been device-validated there, including large request bodies and lifecycle behavior. |
-| **Shadowrocket** | ◐ Partial | — | Supports request / response scripting, but has no SAIR-specific configuration or full acceptance test. |
-| **Quantumult X** | ❌ Not supported | — | Uses different script APIs such as `$task.fetch` and `$prefs`; it needs a dedicated adapter. |
-| **Egern** | ❌ Not supported | — | Uses the `ctx` object and a separate script configuration format, so the current adapter cannot run directly. |
+| **Surge** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Primary reference client with dual-phase interception, arguments UI, and 16MB body buffering. |
+| **Loon** | ✅ Full | [Import plugin](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | Dedicated plugin definition with native form UI arguments and dual-phase scripts. |
+| **Stash** | ✅ Full | [Import override](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true) | Dedicated `.stoverride` definition with argument passing and 16MB multimodal buffer. |
+| **Shadowrocket** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true) | Dedicated module definition fully compatible with Surge module conventions. |
+| **Quantumult X** | ✅ Full | [Import snippet](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true) | Dedicated `.snippet` with built-in `$task.fetch` / `$prefs` compatibility and Safari config portal. |
+| **Egern** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true) | Dedicated YAML module definition supporting the `ctx` object model and storage. |
 
-- SAIR provides a Surge iOS 5.x+ module and a Loon 3.5.1 (983)+ plugin backed by the same dual-phase adapter.
-- The Loon plugin uses the newer Script syntax for object arguments; upgrade Loon to the declared minimum before installing it.
+- SAIR provides dedicated configuration packages across all 6 clients, backed by a unified cross-platform adapter script ([`scripts/sair_adapter.js`](scripts/sair_adapter.js)).
+- For clients without a native argument editing GUI (such as Quantumult X), settings can be updated in real time via Safari at `/sair/config?...`.
 - The official Qwen channel must remain reachable because SAIR uses the original request and SSE session skeleton for response rewriting.
 - Siri's waiting window is short, so complex reasoning models may trigger the official fallback.
 - Visual Intelligence images consume the proxy script request-body buffer; the Surge module sets `max-size` to `16777216` (16 MB).
@@ -278,6 +336,14 @@ SAIR/
 │   └── sair.sgmodule           # Surge iOS module definition
 ├── loon/
 │   └── sair.plugin             # Loon plugin definition and arguments
+├── stash/
+│   └── sair.stoverride         # Stash override configuration
+├── shadowrocket/
+│   └── sair.sgmodule           # Shadowrocket module definition
+├── quantumultx/
+│   └── sair.snippet            # Quantumult X rewrite snippet
+├── egern/
+│   └── sair.yaml               # Egern YAML module definition
 ├── LICENSE                     # MIT License
 ├── README.md                   # Primary Simplified Chinese documentation
 └── README_EN.md                # English documentation
@@ -303,9 +369,7 @@ Make sure the selected client's MITM is enabled, `prod-yabuli.qianwen.com` is in
 <summary><b>3. Which clients can use SAIR directly?</b></summary>
 <br />
 
-Surge and Loon are directly supported. Stash and Shadowrocket are partial and require their own
-acceptance checks. Quantumult X and Egern are not currently supported. See the client support matrix
-above for the boundaries.
+Surge, Loon, Stash, Shadowrocket, Quantumult X, and Egern are all fully adapted with dedicated configuration files and unified runtime polyfills. You can import directly from the matrix above.
 </details>
 
 ## Disclaimer

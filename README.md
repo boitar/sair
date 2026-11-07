@@ -5,8 +5,12 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#环境要求)
-[![Surge](https://img.shields.io/badge/Surge-Dual--Hook%20Engine-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
+[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
 [![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
+[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true)
+[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true)
+[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true)
+[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#主流服务商配置示例)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
@@ -36,7 +40,7 @@
 
 ## 项目简介
 
-国行版 **Apple 智能（Apple Intelligence）** 在调用第三方扩展能力时，会由设备直接通过标准 TLS 1.3 连接请求阿里云通义千问网关（`prod-yabuli.qianwen.com`）。SAIR 利用这一网络特征，通过 **Surge 或 Loon** 的 `http-request` 与 `http-response` 双阶段脚本，在设备本地完成透明拦截、请求转接和 SSE 回包重写。
+国行版 **Apple 智能（Apple Intelligence）** 在调用第三方扩展能力时，会由设备直接通过标准 TLS 1.3 连接请求阿里云通义千问网关（`prod-yabuli.qianwen.com`）。SAIR 利用这一网络特征，通过 **Surge、Loon、Stash、Shadowrocket、Quantumult X 或 Egern** 的双阶段脚本与重写规则，在设备本地完成透明拦截、请求转接和 SSE 回包重写。
 
 安装完成后，系统级**写作工具**、**Siri 智能问答**和**视觉智能相机**仍然使用原生入口与交互界面，但底层生成模型可以切换到任意兼容 OpenAI `/v1/chat/completions` 的服务，包括 OpenAI、Gemini、Claude、DeepSeek、OpenRouter 以及自建 Ollama / vLLM 网关。
 
@@ -92,7 +96,7 @@ sequenceDiagram
 ### 环境要求
 
 1. **设备与系统**：运行 iOS 27.3+、已启用国行 Apple 智能的 iPhone 或 iPad。
-2. **代理客户端**：Surge iOS 5.x+（开启 **MITM**、**Rewrite** 和 **Scripting**），或 Loon 3.5.1 (983)+。
+2. **代理客户端**：Surge iOS 5.x+、Loon 3.5.1+、Stash 2.5+、Shadowrocket 最新版、Quantumult X 1.0.30+ 或 Egern 最新版（开启 **MITM** 与 **脚本/重写** 功能）。
 3. **证书信任**：在“设置 → 通用 → 关于本机 → 证书信任设置”中完全信任所选客户端的 MITM CA 根证书。
 4. **模型凭证**：准备一个支持 OpenAI `/v1/chat/completions` 的上游服务和 API Key。
 
@@ -112,15 +116,31 @@ GitHub 页面使用仓库内模块 / 插件文件的 HTTPS 原始链接，避免
     <tr>
       <th>Surge</th>
       <th>Loon</th>
+      <th>Stash</th>
+      <th>Shadowrocket</th>
+      <th>Quantumult X</th>
+      <th>Egern</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>
-        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">点击一键导入 Surge 模块</a>
+        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">导入 Surge 模块</a>
       </td>
       <td>
-        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">点击一键导入 Loon 插件</a>
+        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">导入 Loon 插件</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true">导入 Stash 覆写</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true">导入 Shadowrocket 模块</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true">导入 QX Snippet</a>
+      </td>
+      <td>
+        <a href="https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true">导入 Egern 模块</a>
       </td>
     </tr>
   </tbody>
@@ -146,9 +166,41 @@ https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
 
 启用插件后，Loon 会显示 SAIR 的可调参数。
 
+### 手动安装 Stash 覆写
+
+在 Stash 中打开 **覆写 (Override) → 从 URL 下载**，填入：
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride
+```
+
+### 手动安装 Shadowrocket 模块
+
+在 Shadowrocket 中打开 **配置 → 模块 → 从 URL 安装**，填入：
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule
+```
+
+### 手动安装 Quantumult X Snippet
+
+在 Quantumult X 中打开 **配置文件 → 编辑 → [rewrite_local] 与 [mitm]**，或在 **重写 → 引用 (Remote)** 中添加引用：
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet
+```
+
+### 手动安装 Egern 模块
+
+在 Egern 中打开 **Modules → Add Module from URL**，填入：
+
+```text
+https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml
+```
+
 ### 配置模型网关
 
-在 Surge 的 **模块 → SAIR → 编辑参数**，或 Loon 的 SAIR 插件参数面板中，填入你的上游地址和 API Key：
+在各客户端的模块/插件设置中填入参数，或在 Surge 的 **模块 → SAIR → 编辑参数** 中配置：
 
 ```ini
 endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini
@@ -156,9 +208,16 @@ endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&mode
 
 如果只填写服务商的 `/v1` 基础地址，脚本会自动补全 `/chat/completions`。
 
-Loon 插件会把同一份 [`scripts/sair_adapter.js`](scripts/sair_adapter.js) 注册为请求与响应脚本，
-并自动追加 `prod-yabuli.qianwen.com` 的 MITM 主机名。`notify`、`fallback` 和三个场景超时也可以
-直接在插件参数中调整；脚本会同时兼容 Loon 的参数对象和 Surge 的 `key=value` 参数字符串。
+> [!TIP]
+> **通用快捷配置（适用于 Quantumult X、Stash 及所有客户端）**：
+> 启动代理后，直接在 Safari 中打开如下链接，脚本会自动将参数写入持久化存储并立即生效：
+> ```text
+> https://prod-yabuli.qianwen.com/sair/config?endpoint=https://api.openai.com/v1/chat/completions&api_key=sk-your-api-key&model=gpt-4o-mini&model=gpt-4o-mini
+> ```
+> 如需清除持久化配置恢复模块默认值，在 Safari 访问：
+> ```text
+> https://prod-yabuli.qianwen.com/sair/reset
+> ```
 
 ### 在线验证
 
@@ -247,15 +306,15 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | 客户端 | 状态 | 导入入口 | 说明 |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ 完整支持 | [导入模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 当前主验证客户端，支持请求 / 响应双阶段和完整参数配置。 |
-| **Loon** | ✅ 完整支持 | [导入插件](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | 使用独立插件定义，参数对象和双阶段脚本已适配。 |
-| **Stash** | ◐ 部分支持 | [尝试导入 Surge 模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 脚本 API 接近 Surge，但当前没有 SAIR 的实机验收，不能保证模块生命周期和大请求体行为。 |
-| **Shadowrocket** | ◐ 部分支持 | — | 支持请求 / 响应脚本，但没有 SAIR 专用配置和完整验收，需自行调整规则并测试。 |
-| **Quantumult X** | ❌ 暂不支持 | — | 使用 `$task.fetch`、`$prefs` 等不同脚本 API，需要单独编写适配器。 |
-| **Egern** | ❌ 暂不支持 | — | 使用 `ctx` 对象和独立脚本配置格式，不能直接运行当前适配器。 |
+| **Surge** | ✅ 完整支持 | [导入模块](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | 官方推荐主客户端，支持请求 / 响应双阶段拦截、参数编辑和 16MB 大请求体缓存。 |
+| **Loon** | ✅ 完整支持 | [导入插件](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | 专用插件定义，原生表单参数可视化配置，新版 Script 语法双阶段拦截。 |
+| **Stash** | ✅ 完整适配 | [导入覆写](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true) | 专用 `.stoverride` 规则覆盖，支持参数传递与 16MB 大请求体多模态图片。 |
+| **Shadowrocket** | ✅ 完整适配 | [导入模块](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true) | 专用模块配置，完全兼容 Surge 模块规范与参数配置。 |
+| **Quantumult X** | ✅ 完整适配 | [导入 Snippet](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true) | 专用 `.snippet` 重写，内置兼容层适配 `$task.fetch` / `$prefs`，支持 Safari 动态传参。 |
+| **Egern** | ✅ 完整适配 | [导入模块](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true) | 专用 YAML 模块定义，适配 `ctx` 对象模型与持久化存储。 |
 
-- SAIR 已提供 Surge iOS 5.x+ 模块和 Loon 3.5.1 (983)+ 插件，两者共用同一个双阶段适配脚本。
-- Loon 插件使用新版 Script 语法传入参数对象；如果使用更早版本的 Loon，请升级到插件声明的最低版本。
+- SAIR 已提供覆盖 6 大主流客户端的专用配置文件，由同一定制的跨平台适配脚本 [`scripts/sair_adapter.js`](scripts/sair_adapter.js) 统一驱动。
+- 在未提供图形化模块参数编辑面板的客户端（如 Quantumult X），可在 Safari 中访问 `/sair/config?...` 动态保存与生效配置。
 - 系统必须仍能访问官方千问通道；SAIR 需要原始请求和 SSE 会话骨架来完成响应重写。
 - Siri 场景的等待窗口较短，复杂推理模型可能触发官方回退。
 - 视觉智能图片会占用代理脚本请求体缓冲区；Surge 模块已将 `max-size` 配置为 `16777216`（16 MB）。
@@ -275,6 +334,14 @@ SAIR/
 │   └── sair.sgmodule           # Surge iOS 模块定义
 ├── loon/
 │   └── sair.plugin             # Loon 插件定义与可调参数
+├── stash/
+│   └── sair.stoverride         # Stash 覆写规则配置
+├── shadowrocket/
+│   └── sair.sgmodule           # Shadowrocket 专用模块
+├── quantumultx/
+│   └── sair.snippet            # Quantumult X 重写片段
+├── egern/
+│   └── sair.yaml               # Egern 模块定义
 ├── LICENSE                     # MIT 开源许可证
 ├── README.md                   # 中文主文档
 └── README_EN.md                # English documentation
@@ -300,8 +367,7 @@ SAIR/
 <summary><b>3. 哪些客户端可以直接使用？</b></summary>
 <br />
 
-Surge 和 Loon 可以直接使用；Stash、Shadowrocket 目前属于部分支持，需要自行验收；
-Quantumult X 和 Egern 暂不支持。具体边界见上方的客户端支持情况表。
+Surge、Loon、Stash、Shadowrocket、Quantumult X 与 Egern 均已完成专用配置适配与统一脚本运行时支持，直接通过上方表格导入对应文件即可使用。
 </details>
 
 ## 免责声明
