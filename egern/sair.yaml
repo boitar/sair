@@ -1,0 +1,61 @@
+name: SAIR - Siri-ously AI Router
+description: Route Apple Intelligence (iOS 27.3+) requests to your preferred LLM providers (OpenAI / Gemini / Claude / DeepSeek / Self-hosted) through Egern. Supports Writing Tools, Siri QA, and Visual Intelligence.
+author: boitar
+homepage: https://github.com/boitar/sair
+
+mitm:
+  hostnames:
+    - prod-yabuli.qianwen.com
+
+scriptings:
+  - name: SAIR Inspector Request
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+    type: request
+    require_body: false
+    timeout: 15
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    arguments:
+      endpoint: https://api.openai.com/v1/chat/completions
+      api_key: ""
+      model: gpt-4o-mini
+      notify: error
+      fallback: true
+
+  - name: SAIR Inspector Response
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+    type: response
+    require_body: false
+    timeout: 15
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    arguments:
+      endpoint: https://api.openai.com/v1/chat/completions
+      api_key: ""
+      model: gpt-4o-mini
+      notify: error
+      fallback: true
+
+  - name: SAIR Request
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
+    type: request
+    require_body: true
+    timeout: 60
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    arguments:
+      endpoint: https://api.openai.com/v1/chat/completions
+      api_key: ""
+      model: gpt-4o-mini
+      notify: error
+      fallback: true
+
+  - name: SAIR Response
+    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
+    type: response
+    require_body: true
+    timeout: 60
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    arguments:
+      endpoint: https://api.openai.com/v1/chat/completions
+      api_key: ""
+      model: gpt-4o-mini
+      notify: error
+      fallback: true

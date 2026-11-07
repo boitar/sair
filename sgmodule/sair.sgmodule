@@ -19,9 +19,9 @@ hostname = %APPEND% prod-yabuli.qianwen.com
 # - timeout_writing: Writing Tools timeout in seconds (default: 15)
 # - timeout_vision: Visual Intelligence timeout in seconds (default: 10)
 
-SAIR Inspector Request = type=http-request,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js,argument="endpoint=https://api.openai.com/v1/chat/completions&api_key=YOUR_API_KEY&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10"
+SAIR Inspector Request = type=http-request,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js,argument="endpoint=https://api.openai.com/v1/chat/completions&api_key=YOUR_API_KEY&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10"
 
-SAIR Inspector Response = type=http-response,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js,argument="endpoint=https://api.openai.com/v1/chat/completions&api_key=YOUR_API_KEY&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10"
+SAIR Inspector Response = type=http-response,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js,argument="endpoint=https://api.openai.com/v1/chat/completions&api_key=YOUR_API_KEY&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10"
 
 SAIR Request = type=http-request,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/.*,requires-body=true,max-size=16777216,timeout=60,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js,argument="endpoint=https://api.openai.com/v1/chat/completions&api_key=YOUR_API_KEY&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10"
 

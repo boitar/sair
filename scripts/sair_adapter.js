@@ -1,7 +1,7 @@
 /**
  * SAIR (Siri-ously AI Router)
- * Universal Surge / Loon Adapter Script for Apple Intelligence (iOS 27.3+)
- * 
+ * Universal Multi-Client Adapter Script for Apple Intelligence (iOS 27.3+)
+ * Compatible with Surge, Loon, Stash, Shadowrocket, Quantumult X, and Egern.
  * Repository: https://github.com/boitar/sair
  * License: MIT
  */
@@ -10,16 +10,32 @@
 // 1. Configuration & Argument Parsing
 // =========================================================================
 
-function getArgumentMap() {
-  if (typeof $argument === "undefined" || $argument === null) return {};
+function detectClient() {
+  if (typeof $task !== "undefined") return "Quantumult X";
+  if (typeof $loon !== "undefined") return "Loon";
+  if (typeof ctx !== "undefined") return "Egern";
+  if (typeof $environment !== "undefined" && $environment["surge-version"]) return "Surge";
+  if (typeof $stash !== "undefined") return "Stash";
+  if (typeof $rocket !== "undefined") return "Shadowrocket";
+  if (typeof $prefs !== "undefined") return "Quantumult X";
+  if (typeof $persistentStore !== "undefined") return "Surge / Loon / Stash / Shadowrocket";
+  return "Unknown Client";
+}
 
-  // Loon exposes plugin [Argument] values as an object, while Surge module
-  // arguments arrive as a URL-style query string.
-  if (typeof $argument === "object") return $argument;
-  if (typeof $argument !== "string" || !$argument.trim()) return {};
+function getArgumentMap() {
+  let rawArg = (typeof $argument !== "undefined" && $argument !== null) ? $argument : null;
+  if (!rawArg && typeof ctx !== "undefined" && ctx && ctx.argument) {
+    rawArg = ctx.argument;
+  }
+  if (!rawArg) return {};
+
+  // Loon and Egern expose arguments as objects, while Surge/Stash/Shadowrocket
+  // pass URL-style query strings.
+  if (typeof rawArg === "object") return rawArg;
+  if (typeof rawArg !== "string" || !rawArg.trim()) return {};
 
   const result = {};
-  for (const pair of $argument.split("&")) {
+  for (const pair of rawArg.split("&")) {
     const [rawKey, ...valueParts] = pair.split("=");
     if (!rawKey) continue;
     const key = rawKey.trim();
@@ -35,38 +51,140 @@ function getArgumentMap() {
 }
 
 function readPersistent(key) {
-  if (typeof $persistentStore === "undefined" || !$persistentStore || typeof $persistentStore.read !== "function") {
-    return null;
+  if (typeof $persistentStore !== "undefined" && $persistentStore && typeof $persistentStore.read === "function") {
+    try {
+      const val = $persistentStore.read(key);
+      if (val !== null && typeof val !== "undefined" && val !== "") return val;
+    } catch (e) {}
   }
-  try {
-    return $persistentStore.read(key);
-  } catch (e) {
-    return null;
+  if (typeof $prefs !== "undefined" && $prefs && typeof $prefs.valueForKey === "function") {
+    try {
+      const val = $prefs.valueForKey(key);
+      if (val !== null && typeof val !== "undefined" && val !== "") return val;
+    } catch (e) {}
   }
+  if (typeof ctx !== "undefined" && ctx && ctx.storage && typeof ctx.storage.get === "function") {
+    try {
+      const val = ctx.storage.get(key);
+      if (val !== null && typeof val !== "undefined" && val !== "") return val;
+    } catch (e) {}
+  }
+  return null;
 }
 
 function writePersistent(value, key) {
-  if (typeof $persistentStore === "undefined" || !$persistentStore || typeof $persistentStore.write !== "function") {
-    return false;
+  const strVal = String(value);
+  let written = false;
+  if (typeof $persistentStore !== "undefined" && $persistentStore && typeof $persistentStore.write === "function") {
+    try {
+      written = $persistentStore.write(strVal, key) || written;
+    } catch (e) {}
   }
-  try {
-    return $persistentStore.write(String(value), key);
-  } catch (e) {
-    return false;
+  if (typeof $prefs !== "undefined" && $prefs && typeof $prefs.setValueForKey === "function") {
+    try {
+      written = $prefs.setValueForKey(strVal, key) || written;
+    } catch (e) {}
   }
+  if (typeof ctx !== "undefined" && ctx && ctx.storage && typeof ctx.storage.set === "function") {
+    try {
+      ctx.storage.set(key, strVal);
+      written = true;
+    } catch (e) {}
+  }
+  return written;
 }
 
 function isResponsePhase() {
-  return typeof $response !== "undefined" && $response !== null;
+  if (typeof $response !== "undefined" && $response !== null) return true;
+  if (typeof ctx !== "undefined" && ctx && ctx.response) return true;
+  return false;
+}
+
+function getRequestUrl() {
+  if (typeof $request !== "undefined" && $request && $request.url) return $request.url;
+  if (typeof ctx !== "undefined" && ctx && ctx.request && ctx.request.url) return ctx.request.url;
+  return "";
+}
+
+function normalizeBodyToString(body) {
+  if (!body) return "";
+  if (typeof body === "string") return body;
+  if (typeof TextDecoder !== "undefined" && (body instanceof ArrayBuffer || ArrayBuffer.isView(body))) {
+    try {
+      return new TextDecoder("utf-8").decode(body);
+    } catch (e) {}
+  }
+  try {
+    return String(body);
+  } catch (e) {
+    return "";
+  }
+}
+
+function getRequestBody() {
+  let raw = "";
+  if (typeof $request !== "undefined" && $request && typeof $request.body !== "undefined") {
+    raw = $request.body;
+  } else if (typeof ctx !== "undefined" && ctx && ctx.request && typeof ctx.request.body !== "undefined") {
+    raw = ctx.request.body;
+  }
+  return normalizeBodyToString(raw);
+}
+
+function getResponseBody() {
+  let raw = "";
+  if (typeof $response !== "undefined" && $response && typeof $response.body !== "undefined") {
+    raw = $response.body;
+  } else if (typeof ctx !== "undefined" && ctx && ctx.response && typeof ctx.response.body !== "undefined") {
+    raw = ctx.response.body;
+  }
+  return normalizeBodyToString(raw);
+}
+
+function done(result) {
+  if (typeof $done === "function") {
+    $done(result || {});
+  } else if (typeof ctx !== "undefined" && ctx && typeof ctx.done === "function") {
+    ctx.done(result || {});
+  }
 }
 
 function doneWithResponse(response) {
-  // Request scripts need the nested Surge/Loon response envelope. Response
-  // scripts modify the current response with top-level status/headers/body.
+  const status = response.status || 200;
+  const headers = response.headers || { "Content-Type": "application/json; charset=utf-8" };
+  const body = response.body || "";
+
+  const isQX = typeof $task !== "undefined" || (typeof $prefs !== "undefined" && typeof $httpClient === "undefined");
+
   if (isResponsePhase()) {
-    $done(response);
-  } else {
-    $done({ response });
+    if (typeof $done === "function") {
+      $done({ status: status, headers: headers, body: body });
+    } else if (typeof ctx !== "undefined" && ctx && typeof ctx.done === "function") {
+      ctx.done({ status: status, headers: headers, body: body });
+    }
+    return;
+  }
+
+  // Request phase mock response
+  if (isQX) {
+    let statusText = "OK";
+    if (status === 502) statusText = "Bad Gateway";
+    else if (status === 504) statusText = "Gateway Timeout";
+    else if (status >= 400) statusText = "Error";
+    if (typeof $done === "function") {
+      $done({
+        status: `HTTP/1.1 ${status} ${statusText}`,
+        headers: headers,
+        body: body
+      });
+    }
+    return;
+  }
+
+  if (typeof $done === "function") {
+    $done({ response: { status: status, headers: headers, body: body } });
+  } else if (typeof ctx !== "undefined" && ctx && typeof ctx.done === "function") {
+    ctx.done({ response: { status: status, headers: headers, body: body } });
   }
 }
 
@@ -104,21 +222,25 @@ function getConfiguration() {
   }
 
   // PersistentStore overrides (if set via custom UI or script)
-  if (typeof $persistentStore !== "undefined") {
-    const psEndpoint = readPersistent("SAIR_ENDPOINT");
-    if (psEndpoint) defaults.endpoint = psEndpoint;
-    const psKey = readPersistent("SAIR_API_KEY");
-    if (psKey) defaults.api_key = psKey;
-    const psModel = readPersistent("SAIR_MODEL");
-    if (psModel) defaults.model = psModel;
-    const psNotify = readPersistent("SAIR_NOTIFY");
-    if (psNotify) defaults.notify = String(psNotify).toLowerCase();
-    const psFallback = readPersistent("SAIR_FALLBACK");
-    if (psFallback !== null && psFallback !== undefined) {
-      const fallbackValue = String(psFallback).toLowerCase();
-      defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
-    }
+  const psEndpoint = readPersistent("SAIR_ENDPOINT");
+  if (psEndpoint) defaults.endpoint = psEndpoint;
+  const psKey = readPersistent("SAIR_API_KEY");
+  if (psKey) defaults.api_key = psKey;
+  const psModel = readPersistent("SAIR_MODEL");
+  if (psModel) defaults.model = psModel;
+  const psNotify = readPersistent("SAIR_NOTIFY");
+  if (psNotify) defaults.notify = String(psNotify).toLowerCase();
+  const psFallback = readPersistent("SAIR_FALLBACK");
+  if (psFallback !== null && psFallback !== undefined) {
+    const fallbackValue = String(psFallback).toLowerCase();
+    defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
   }
+  const psTimeoutSiri = readPersistent("SAIR_TIMEOUT_SIRI");
+  if (psTimeoutSiri) defaults.timeout_siri = parseInt(psTimeoutSiri, 10) || 7;
+  const psTimeoutWriting = readPersistent("SAIR_TIMEOUT_WRITING");
+  if (psTimeoutWriting) defaults.timeout_writing = parseInt(psTimeoutWriting, 10) || 15;
+  const psTimeoutVision = readPersistent("SAIR_TIMEOUT_VISION");
+  if (psTimeoutVision) defaults.timeout_vision = parseInt(psTimeoutVision, 10) || 10;
 
   // Normalize endpoint URL: ensure /chat/completions is present if only base URL provided
   if (defaults.endpoint.endsWith("/v1") || defaults.endpoint.endsWith("/v1/")) {
@@ -129,12 +251,102 @@ function getConfiguration() {
 }
 
 function notify(config, title, subtitle, message, isError = false) {
-  if (config.notify === "none") return;
+  if (!config || config.notify === "none") return;
   if (config.notify === "all" || (config.notify === "error" && isError)) {
     if (typeof $notification !== "undefined" && $notification && typeof $notification.post === "function") {
-      $notification.post(title, subtitle, message);
+      try {
+        $notification.post(title, subtitle, message);
+        return;
+      } catch (e) {}
+    }
+    if (typeof $notify === "function") {
+      try {
+        $notify(title, subtitle, message);
+        return;
+      } catch (e) {}
+    }
+    if (typeof ctx !== "undefined" && ctx && typeof ctx.notify === "function") {
+      try {
+        ctx.notify(title, subtitle, message);
+        return;
+      } catch (e) {}
     }
   }
+}
+
+function fetchHttp(options, callback) {
+  const method = (options.method || "GET").toUpperCase();
+
+  // 1. Quantumult X ($task.fetch)
+  if (typeof $task !== "undefined" && $task && typeof $task.fetch === "function") {
+    const qxOpts = {
+      url: options.url,
+      method: method,
+      headers: options.headers || {},
+      body: options.body || "",
+      timeout: options.timeout || 10
+    };
+    $task.fetch(qxOpts).then(
+      function(resp) {
+        callback(null, resp, resp.body);
+      },
+      function(reason) {
+        const err = (reason && reason.error) ? reason.error : (reason || "Request failed");
+        callback(err, null, null);
+      }
+    );
+    return;
+  }
+
+  // 2. Surge / Loon / Stash / Shadowrocket ($httpClient)
+  if (typeof $httpClient !== "undefined" && $httpClient) {
+    const fn = method === "POST" ? $httpClient.post : $httpClient.get;
+    if (typeof fn === "function") {
+      fn.call($httpClient, options, function(err, resp, data) {
+        callback(err, resp, data);
+      });
+      return;
+    }
+  }
+
+  // 3. Egern (ctx.http)
+  if (typeof ctx !== "undefined" && ctx && ctx.http) {
+    const fn = method === "POST" ? ctx.http.post : ctx.http.get;
+    if (typeof fn === "function") {
+      fn(options).then(
+        function(resp) {
+          callback(null, resp, resp.body);
+        },
+        function(err) {
+          callback(err, null, null);
+        }
+      );
+      return;
+    }
+  }
+
+  callback("No supported HTTP client environment found", null, null);
+}
+
+function parseUrlQuery(url) {
+  if (!url) return {};
+  const queryIdx = url.indexOf("?");
+  if (queryIdx === -1) return {};
+  const queryString = url.slice(queryIdx + 1);
+  const result = {};
+  for (const pair of queryString.split("&")) {
+    const [rawKey, ...valueParts] = pair.split("=");
+    if (!rawKey) continue;
+    const key = rawKey.trim();
+    if (!key) continue;
+    const rawValue = valueParts.join("=").trim();
+    try {
+      result[key] = decodeURIComponent(rawValue);
+    } catch (e) {
+      result[key] = rawValue;
+    }
+  }
+  return result;
 }
 
 // =========================================================================
@@ -142,10 +354,13 @@ function notify(config, title, subtitle, message, isError = false) {
 // =========================================================================
 
 function handleInspectorRoute(url, config) {
+  if (!url) return false;
+
   // Route: /sair/models -> fetch models from configured provider
   if (url.includes("/sair/models")) {
     const modelsUrl = config.endpoint.replace(/\/chat\/completions\/?$/, "/models");
-    $httpClient.get({
+    fetchHttp({
+      method: "GET",
       url: modelsUrl,
       headers: {
         "Authorization": config.api_key ? "Bearer " + config.api_key : "",
@@ -170,20 +385,70 @@ function handleInspectorRoute(url, config) {
     return true;
   }
 
-  // Route: /sair/config or /sair/status -> inspect active configuration
-  if (url.includes("/sair/config") || url.includes("/sair/status")) {
-    const safeConfig = Object.assign({}, config, {
-      api_key: config.api_key ? (config.api_key.slice(0, 4) + "••••••••" + config.api_key.slice(-4)) : "(none)"
-    });
+  // Route: /sair/reset -> clear persistent configuration back to module defaults
+  if (url.includes("/sair/reset")) {
+    const keys = [
+      "SAIR_ENDPOINT", "SAIR_API_KEY", "SAIR_MODEL", "SAIR_NOTIFY",
+      "SAIR_FALLBACK", "SAIR_TIMEOUT_SIRI", "SAIR_TIMEOUT_WRITING", "SAIR_TIMEOUT_VISION"
+    ];
+    for (const k of keys) {
+      writePersistent("", k);
+    }
     doneWithResponse({
       status: 200,
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
         project: "SAIR (Siri-ously AI Router)",
-        version: "1.0.0",
-        active_configuration: safeConfig,
+        version: "1.1.0",
+        client_runtime: detectClient(),
+        message: "All persistent settings have been reset to module defaults.",
         timestamp: new Date().toISOString()
       }, null, 2)
+    });
+    return true;
+  }
+
+  // Route: /sair/config or /sair/status -> inspect or dynamically update configuration
+  if (url.includes("/sair/config") || url.includes("/sair/status")) {
+    let updateNotice = null;
+    const query = parseUrlQuery(url);
+
+    if (Object.keys(query).length > 0) {
+      const updatedKeys = [];
+      if (query.endpoint) { writePersistent(query.endpoint, "SAIR_ENDPOINT"); updatedKeys.push("endpoint"); }
+      if (query.api_key !== undefined) { writePersistent(query.api_key, "SAIR_API_KEY"); updatedKeys.push("api_key"); }
+      if (query.model) { writePersistent(query.model, "SAIR_MODEL"); updatedKeys.push("model"); }
+      if (query.notify) { writePersistent(query.notify, "SAIR_NOTIFY"); updatedKeys.push("notify"); }
+      if (query.fallback !== undefined) { writePersistent(query.fallback, "SAIR_FALLBACK"); updatedKeys.push("fallback"); }
+      if (query.timeout_siri) { writePersistent(query.timeout_siri, "SAIR_TIMEOUT_SIRI"); updatedKeys.push("timeout_siri"); }
+      if (query.timeout_writing) { writePersistent(query.timeout_writing, "SAIR_TIMEOUT_WRITING"); updatedKeys.push("timeout_writing"); }
+      if (query.timeout_vision) { writePersistent(query.timeout_vision, "SAIR_TIMEOUT_VISION"); updatedKeys.push("timeout_vision"); }
+
+      if (updatedKeys.length > 0) {
+        updateNotice = `Updated configuration keys via URL: ${updatedKeys.join(", ")}`;
+      }
+    }
+
+    const activeConfig = getConfiguration();
+    const safeConfig = Object.assign({}, activeConfig, {
+      api_key: activeConfig.api_key ? (activeConfig.api_key.slice(0, 4) + "••••••••" + activeConfig.api_key.slice(-4)) : "(none)"
+    });
+
+    const responsePayload = {
+      project: "SAIR (Siri-ously AI Router)",
+      version: "1.1.0",
+      client_runtime: detectClient(),
+      active_configuration: safeConfig,
+      timestamp: new Date().toISOString()
+    };
+    if (updateNotice) {
+      responsePayload.notice = updateNotice;
+    }
+
+    doneWithResponse({
+      status: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(responsePayload, null, 2)
     });
     return true;
   }
@@ -461,7 +726,7 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
 
 (function main() {
   const config = getConfiguration();
-  const reqUrl = (typeof $request !== "undefined" && $request.url) ? $request.url : "";
+  const reqUrl = getRequestUrl();
 
   // Check if this is an inspector / helper endpoint request
   if (handleInspectorRoute(reqUrl, config)) {
@@ -474,7 +739,7 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
   // Phase 1: HTTP-REQUEST (Capture Prompt / Image & Cache)
   // -----------------------------------------------------------------------
   if (isRequest) {
-    const reqBody = (typeof $request !== "undefined" && $request.body) ? $request.body : "";
+    const reqBody = getRequestBody();
     const { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
 
     if (prompt || imageUrl) {
@@ -491,15 +756,15 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
       notify(config, "SAIR 请求提示", "未解析到有效 Prompt 或图像", (reqBody || "空请求体").slice(0, 40), false);
     }
 
-    $done({});
+    done({});
     return;
   }
 
   // -----------------------------------------------------------------------
   // Phase 2: HTTP-RESPONSE (Intercept Qwen Response & Route to Custom LLM)
   // -----------------------------------------------------------------------
-  const realBody = $response.body || "";
-  const reqBody = (typeof $request !== "undefined" && $request.body) ? $request.body : "";
+  const realBody = getResponseBody();
+  const reqBody = getRequestBody();
 
   // Resolve prompt, image, and scenario
   let { prompt, imageUrl, scenario } = extractPromptAndImage(reqBody);
@@ -521,23 +786,28 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
   else if (scenario === "vision" || imageUrl) targetTimeout = config.timeout_vision;
 
   let finished = false;
+  let failsafeTimer = null;
   function finishWith(body, isError = false, errMsg = "") {
+    if (failsafeTimer) {
+      clearTimeout(failsafeTimer);
+      failsafeTimer = null;
+    }
     if (!finished) {
       finished = true;
       if (body) {
-        $done({ body: body });
+        done({ body: body });
       } else {
         // Fallback decision
         if (config.fallback) {
           if (isError) {
             notify(config, "SAIR 触发官方回退", errMsg || "请求失败或超时", "已自动放行官方千问回包", true);
           }
-          $done({});
+          done({});
         } else {
           notify(config, "SAIR 请求异常", errMsg || "自定义模型调用失败", "已按配置阻断请求 (未回退官方)", true);
           doneWithResponse({
             status: 504,
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json; charset=utf-8" },
             body: JSON.stringify({ error: errMsg || "Custom model gateway timeout/failure" })
           });
         }
@@ -546,7 +816,7 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
   }
 
   // Failsafe timeout timer
-  setTimeout(() => {
+  failsafeTimer = setTimeout(() => {
     finishWith(null, true, `网关超时 (${targetTimeout}s)`);
   }, (targetTimeout + 1) * 1000);
 
@@ -577,7 +847,8 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
     reqHeaders["Authorization"] = "Bearer " + config.api_key;
   }
 
-  $httpClient.post({
+  fetchHttp({
+    method: "POST",
     url: config.endpoint,
     headers: reqHeaders,
     body: JSON.stringify({
