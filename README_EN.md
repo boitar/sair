@@ -246,6 +246,17 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 ## Compatibility and known limitations
 
+### Client support matrix
+
+| Client | Status | Import entry | Notes |
+| :--- | :---: | :--- | :--- |
+| **Surge** | ✅ Full | [Import module](sgmodule/sair.sgmodule?raw=true) | Primary validation client with complete request / response hooks and arguments. |
+| **Loon** | ✅ Full | [Import plugin](loon/sair.plugin?raw=true) | Dedicated plugin definition with object arguments and dual-phase scripts. |
+| **Stash** | ◐ Partial | [Try the Surge module](sgmodule/sair.sgmodule?raw=true) | Its script APIs are close to Surge, but SAIR has not been device-validated there, including large request bodies and lifecycle behavior. |
+| **Shadowrocket** | ◐ Partial | — | Supports request / response scripting, but has no SAIR-specific configuration or full acceptance test. |
+| **Quantumult X** | ❌ Not supported | — | Uses different script APIs such as `$task.fetch` and `$prefs`; it needs a dedicated adapter. |
+| **Egern** | ❌ Not supported | — | Uses the `ctx` object and a separate script configuration format, so the current adapter cannot run directly. |
+
 - SAIR provides a Surge iOS 5.x+ module and a Loon 3.5.1 (983)+ plugin backed by the same dual-phase adapter.
 - The Loon plugin uses the newer Script syntax for object arguments; upgrade Loon to the declared minimum before installing it.
 - The official Qwen channel must remain reachable because SAIR uses the original request and SSE session skeleton for response rewriting.
@@ -289,12 +300,12 @@ Make sure the selected client's MITM is enabled, `prod-yabuli.qianwen.com` is in
 </details>
 
 <details>
-<summary><b>3. Does this support Loon, Quantumult X, or Stash?</b></summary>
+<summary><b>3. Which clients can use SAIR directly?</b></summary>
 <br />
 
-Loon is supported through [`loon/sair.plugin`](loon/sair.plugin). Quantumult X and Stash still
-require their own rule migration and mappings for the `$httpClient`, `$persistentStore`, and dual-phase
-`$done` lifecycle used by [`scripts/sair_adapter.js`](scripts/sair_adapter.js).
+Surge and Loon are directly supported. Stash and Shadowrocket are partial and require their own
+acceptance checks. Quantumult X and Egern are not currently supported. See the client support matrix
+above for the boundaries.
 </details>
 
 ## Disclaimer
