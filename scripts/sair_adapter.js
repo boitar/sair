@@ -384,7 +384,7 @@ function parseUrlQuery(url) {
 
 function handleInspectorRoute(url, config) {
   if (!url) return false;
-  const isDedicatedHost = url.includes("sair.local") || url.includes("sair.hub") || url.includes("127.0.0.1") || url.includes("localhost");
+  const isDedicatedHost = url.includes("sair.box") || url.includes("sair.hub") || url.includes("sair.ai") || url.includes("sair.local") || url.includes("127.0.0.1") || url.includes("localhost");
   const isSairPath = url.includes("/sair");
   if (!isDedicatedHost && !isSairPath) return false;
 
@@ -919,7 +919,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     ${noticeHtml}
 
     <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:12px;color:#38bdf8;line-height:1.5;">
-      💡 <b>贴心提示</b>：本控制台无需 HTTPS 证书，随时通过浏览器访问 <code>http://sair.local</code> 即可配置。<br />
+      💡 <b>贴心提示</b>：开箱即用，免配证书！随时通过 Safari 访问 <code>http://sair.box</code> 或 <code>http://sair.hub</code> 即可配置。<br />
       Apple 智能与 Siri 的实际劫持需要 Surge 开启「MITM」并信任 CA 证书。
     </div>
 
@@ -1036,7 +1036,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     <div class="footer-links">
       <p>持久化存储将覆盖模块默认参数 · 适用于全客户端<br />
-      本地地址：<a href="http://sair.local">http://sair.local</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
+      本地地址：<a href="http://sair.box">http://sair.box</a> · <a href="http://sair.hub">http://sair.hub</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
     </div>
   </div>
 
