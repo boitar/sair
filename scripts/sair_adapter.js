@@ -401,29 +401,82 @@ function handleInspectorRoute(url, config) {
 
   // Route: /models -> fetch models from configured provider
   if (url.includes("/models")) {
-    const modelsUrl = config.endpoint.replace(/\/chat\/completions\/?$/, "/models");
+    const query = parseUrlQuery(url);
+    const targetEndpoint = (query.endpoint || config.endpoint || "").trim();
+    const targetApiKey = query.api_key !== undefined ? query.api_key.trim() : (config.api_key || "").trim();
+
+    let modelsUrl = targetEndpoint;
+    if (modelsUrl.includes("/chat/completions")) {
+      modelsUrl = modelsUrl.replace(/\/chat\/completions\/?$/, "/models");
+    } else if (modelsUrl.endsWith("/v1") || modelsUrl.endsWith("/v1/")) {
+      modelsUrl = modelsUrl.replace(/\/+$/, "") + "/models";
+    } else if (modelsUrl.includes(":11434")) {
+      modelsUrl = modelsUrl.replace(/\/+$/, "").replace(/\/v1(\/.*)?|\/api(\/.*)?/, "") + "/v1/models";
+    } else if (!modelsUrl.endsWith("/models")) {
+      modelsUrl = modelsUrl.replace(/\/+$/, "") + "/models";
+    }
+
+    if (!modelsUrl || !modelsUrl.startsWith("http")) {
+      doneWithResponse({
+        status: 400,
+        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "Invalid endpoint URL", endpoint: targetEndpoint })
+      });
+      return true;
+    }
+
     fetchHttp({
       method: "GET",
       url: modelsUrl,
       headers: {
-        "Authorization": config.api_key ? "Bearer " + config.api_key : "",
+        "Authorization": targetApiKey ? "Bearer " + targetApiKey : "",
         "Content-Type": "application/json"
       },
-      timeout: 10
+      timeout: 12
     }, function(err, resp, data) {
       if (err || !data) {
         doneWithResponse({
           status: 502,
           headers: { "Content-Type": "application/json; charset=utf-8" },
-          body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err) })
+          body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err), url: modelsUrl })
         });
         return;
       }
-      doneWithResponse({
-        status: 200,
-        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
-        body: data
-      });
+      try {
+        const parsed = JSON.parse(data);
+        let modelList = [];
+        if (Array.isArray(parsed.data)) {
+          modelList = parsed.data.map(function(m) {
+            return m && typeof m === "object" ? (m.id || m.name || "") : String(m);
+          });
+        } else if (Array.isArray(parsed.models)) {
+          modelList = parsed.models.map(function(m) {
+            return m && typeof m === "object" ? (m.name || m.id || "") : String(m);
+          });
+        } else if (Array.isArray(parsed)) {
+          modelList = parsed.map(function(m) {
+            return m && typeof m === "object" ? (m.id || m.name || "") : String(m);
+          });
+        }
+        modelList = modelList.filter(Boolean);
+        doneWithResponse({
+          status: 200,
+          headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+          body: JSON.stringify({
+            success: true,
+            endpoint: modelsUrl,
+            count: modelList.length,
+            models: modelList,
+            raw: parsed
+          })
+        });
+      } catch (parseErr) {
+        doneWithResponse({
+          status: 200,
+          headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+          body: data
+        });
+      }
     });
     return true;
   }
@@ -853,6 +906,91 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       padding: 10px;
     }
     .btn-outline:active { background: rgba(239, 68, 68, 0.1); }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    .btn-fetch-models {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-fetch-models:hover, .btn-fetch-models:active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #7dd3fc;
+    }
+    .btn-fetch-models:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .model-select-card {
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .model-select-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .btn-close-models {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+    .btn-close-models:hover { color: var(--text); }
+    .model-chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .model-item-chip {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .model-item-chip:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+    }
+    .model-item-chip.active {
+      background: var(--primary-gradient);
+      border-color: transparent;
+      color: #ffffff;
+      font-weight: 600;
+    }
     .toast {
       position: fixed;
       top: 24px;
@@ -948,8 +1086,25 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="model">目标模型名称 (Model)</label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label class="form-label" for="model" style="margin-bottom:0;">目标模型名称 (Model)</label>
+            <button type="button" class="btn-fetch-models" id="btnFetchModels" onclick="fetchModelsList()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              获取所有模型
+            </button>
+          </div>
           <input type="text" id="model" name="model" value="${safeModel}" placeholder="gpt-4o-mini" required />
+          <div id="modelSelectContainer" class="model-select-card" style="display:none;">
+            <div class="model-select-header">
+              <span id="modelCountLabel" style="font-size:12px; color:var(--text-muted); font-weight:600;">已获取可用模型</span>
+              <button type="button" class="btn-close-models" onclick="closeModelPicker()">收起</button>
+            </div>
+            <select id="modelDropdown" onchange="onModelDropdownSelected(this.value)">
+              <option value="">-- 点击选择模型或从下方快速选择 --</option>
+            </select>
+            <div id="modelQuickChips" class="model-chips-grid"></div>
+          </div>
+          <div class="field-hint">💡 可手动输入任意模型 ID，或点击右上方「获取所有模型」直接从当前接口拉取可用模型列表并点选。</div>
         </div>
 
         <div class="section-title">
@@ -1022,8 +1177,8 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
             保存配置并立即生效
           </button>
           <button type="button" class="btn btn-secondary" onclick="probeModels()">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            测试上游模型连通性 (/sair/models)
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            获取并选择上游模型列表 (/sair/models)
           </button>
           <button type="button" class="btn btn-outline" onclick="resetConfig()">
             恢复默认配置 (/sair/reset)
@@ -1137,19 +1292,118 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     }
 
     function probeModels() {
+      fetchModelsList();
+    }
+
+    function fetchModelsList() {
+      var ep = document.getElementById("endpoint").value.trim();
+      var key = document.getElementById("api_key").value.trim();
+      var btn = document.getElementById("btnFetchModels");
+      var container = document.getElementById("modelSelectContainer");
+      var dropdown = document.getElementById("modelDropdown");
+      var chipsBox = document.getElementById("modelQuickChips");
+      var countLabel = document.getElementById("modelCountLabel");
       var box = document.getElementById("resultBox");
-      box.style.display = "block";
-      box.innerText = "正在探测上游模型列表 (/sair/models)...";
-      fetch("/sair/models")
-        .then(function(resp) { return resp.json(); })
-        .then(function(json) {
-          box.innerText = JSON.stringify(json, null, 2);
-          showToast("模型探测完成！");
+
+      if (!ep) {
+        showToast("请先填写上游接口地址 (Endpoint)", true);
+        document.getElementById("endpoint").focus();
+        return;
+      }
+
+      btn.disabled = true;
+      var originalBtnHtml = btn.innerHTML;
+      btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
+
+      var fetchUrl = "/sair/models?endpoint=" + encodeURIComponent(ep) + "&api_key=" + encodeURIComponent(key);
+
+      fetch(fetchUrl)
+        .then(function(resp) {
+          if (!resp.ok) {
+            throw new Error("HTTP " + resp.status + " " + resp.statusText);
+          }
+          return resp.json();
+        })
+        .then(function(res) {
+          var models = [];
+          if (res && res.models && Array.isArray(res.models)) {
+            models = res.models;
+          } else if (res && res.data && Array.isArray(res.data)) {
+            models = res.data.map(function(m) { return (m && m.id) || m; });
+          } else if (Array.isArray(res)) {
+            models = res.map(function(m) { return (m && m.id) || m; });
+          }
+
+          models = models.filter(Boolean);
+
+          if (models.length === 0) {
+            showToast("未解析到模型列表，已展示原始响应", true);
+            box.style.display = "block";
+            box.innerText = JSON.stringify(res, null, 2);
+            return;
+          }
+
+          models.sort(function(a, b) {
+            return String(a).localeCompare(String(b));
+          });
+
+          dropdown.innerHTML = '<option value="">-- 点击选择模型 (' + models.length + ' 个可用) --</option>';
+          var curModel = document.getElementById("model").value.trim();
+          models.forEach(function(m) {
+            var opt = document.createElement("option");
+            opt.value = m;
+            opt.textContent = m;
+            if (m === curModel) {
+              opt.selected = true;
+            }
+            dropdown.appendChild(opt);
+          });
+
+          chipsBox.innerHTML = "";
+          models.forEach(function(m) {
+            var chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "model-item-chip" + (m === curModel ? " active" : "");
+            chip.textContent = m;
+            chip.onclick = function() {
+              onModelDropdownSelected(m);
+            };
+            chipsBox.appendChild(chip);
+          });
+
+          countLabel.textContent = "已获取 " + models.length + " 个可用模型（点击直接选中）：";
+          container.style.display = "block";
+          showToast("🎉 成功获取到 " + models.length + " 个模型，请选择！");
+
+          box.style.display = "block";
+          box.innerText = "已成功从 " + (res.endpoint || ep) + " 拉取到 " + models.length + " 个模型：\n" + models.join(", ");
         })
         .catch(function(err) {
-          box.innerText = "探测失败: " + err;
-          showToast("探测失败，请检查上游接口与 Key", true);
+          showToast("拉取失败: " + err.message, true);
+          box.style.display = "block";
+          box.innerText = "获取模型列表失败: " + err.message + "\n请检查 Endpoint 与 API Key 是否正确，或服务商是否支持 /models 端点。";
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnHtml;
         });
+    }
+
+    function onModelDropdownSelected(selectedVal) {
+      if (!selectedVal) return;
+      document.getElementById("model").value = selectedVal;
+      var dd = document.getElementById("modelDropdown");
+      if (dd) dd.value = selectedVal;
+      var chips = document.querySelectorAll(".model-item-chip");
+      chips.forEach(function(c) {
+        if (c.textContent === selectedVal) c.classList.add("active");
+        else c.classList.remove("active");
+      });
+      showToast("已选择模型: " + selectedVal);
+    }
+
+    function closeModelPicker() {
+      document.getElementById("modelSelectContainer").style.display = "none";
     }
 
     function resetConfig() {
@@ -1164,6 +1418,22 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           showToast("重置失败: " + err, true);
         });
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var modelInput = document.getElementById("model");
+      if (modelInput) {
+        modelInput.addEventListener("input", function() {
+          var val = this.value.trim();
+          var dd = document.getElementById("modelDropdown");
+          if (dd) dd.value = val;
+          var chips = document.querySelectorAll(".model-item-chip");
+          chips.forEach(function(c) {
+            if (c.textContent === val) c.classList.add("active");
+            else c.classList.remove("active");
+          });
+        });
+      }
+    });
   </script>
 </body>
 </html>`;
