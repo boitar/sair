@@ -214,7 +214,9 @@ function getConfiguration() {
     timeout_siri: 7,         // seconds for Siri QA (Siri client times out around 6~8s)
     timeout_vision: 10,      // seconds for Visual Intelligence
     reasoning_effort: "low", // for reasoning-capable models (e.g. Gemini / o-series)
-    max_tokens: 400
+    max_tokens: 400,
+    siri_persona_enabled: true,
+    siri_prompt: "你是由 Apple 智能调用的专属伙伴。请直接、自然、口语化地回答用户指令，简明扼要，重点突出，切勿输出多余开场白或客套话。避免使用任何动作描写括号，以便语音自然播报。"
   };
 
   const argumentMap = getArgumentMap();
@@ -234,6 +236,11 @@ function getConfiguration() {
   }
   if (isValidArg(argumentMap.timeout_vision)) {
     defaults.timeout_vision = parseInt(argumentMap.timeout_vision, 10) || 10;
+  }
+  if (isValidArg(argumentMap.siri_prompt)) defaults.siri_prompt = String(argumentMap.siri_prompt);
+  if (isValidArg(argumentMap.siri_persona_enabled)) {
+    const v = String(argumentMap.siri_persona_enabled).toLowerCase();
+    defaults.siri_persona_enabled = v === "true" || v === "1";
   }
 
   // PersistentStore overrides (if set via custom UI or script)
@@ -256,6 +263,13 @@ function getConfiguration() {
   if (psTimeoutWriting) defaults.timeout_writing = parseInt(psTimeoutWriting, 10) || 15;
   const psTimeoutVision = readPersistent("SAIR_TIMEOUT_VISION");
   if (psTimeoutVision) defaults.timeout_vision = parseInt(psTimeoutVision, 10) || 10;
+  const psSiriPrompt = readPersistent("SAIR_SIRI_PROMPT");
+  if (psSiriPrompt !== null && psSiriPrompt !== undefined && psSiriPrompt !== "") defaults.siri_prompt = psSiriPrompt;
+  const psPersonaEnabled = readPersistent("SAIR_SIRI_PERSONA_ENABLED");
+  if (psPersonaEnabled !== null && psPersonaEnabled !== undefined) {
+    const v = String(psPersonaEnabled).toLowerCase();
+    defaults.siri_persona_enabled = v === "true" || v === "1";
+  }
 
   // Normalize endpoint URL: ensure /chat/completions is present if only base URL provided
   if (defaults.endpoint.endsWith("/v1") || defaults.endpoint.endsWith("/v1/")) {
@@ -370,9 +384,23 @@ function parseUrlQuery(url) {
 
 function handleInspectorRoute(url, config) {
   if (!url) return false;
+  const isDedicatedHost = url.includes("sair.box") || url.includes("sair.hub") || url.includes("sair.ai") || url.includes("sair.local") || url.includes("127.0.0.1") || url.includes("localhost");
+  const isSairPath = url.includes("/sair");
+  if (!isDedicatedHost && !isSairPath) return false;
 
-  // Route: /sair/models -> fetch models from configured provider
-  if (url.includes("/sair/models")) {
+  // If this inspector route is being invoked in response phase,
+  // the mock response was already constructed and returned in request phase.
+  // Pass through safely to prevent duplicate processing or overwriting HTML with JSON.
+  if (isResponsePhase()) {
+    if (isDedicatedHost || isSairPath) {
+      if (typeof $done === "function") $done({});
+      else if (typeof ctx !== "undefined" && ctx && typeof ctx.done === "function") ctx.done({});
+      return true;
+    }
+  }
+
+  // Route: /models -> fetch models from configured provider
+  if (url.includes("/models")) {
     const modelsUrl = config.endpoint.replace(/\/chat\/completions\/?$/, "/models");
     fetchHttp({
       method: "GET",
@@ -401,10 +429,11 @@ function handleInspectorRoute(url, config) {
   }
 
   // Route: /sair/reset -> clear persistent configuration back to module defaults
-  if (url.includes("/sair/reset")) {
+  if (url.includes("/reset")) {
     const keys = [
       "SAIR_ENDPOINT", "SAIR_API_KEY", "SAIR_MODEL", "SAIR_NOTIFY",
-      "SAIR_FALLBACK", "SAIR_TIMEOUT_SIRI", "SAIR_TIMEOUT_WRITING", "SAIR_TIMEOUT_VISION"
+      "SAIR_FALLBACK", "SAIR_TIMEOUT_SIRI", "SAIR_TIMEOUT_WRITING", "SAIR_TIMEOUT_VISION",
+      "SAIR_SIRI_PROMPT", "SAIR_SIRI_PERSONA_ENABLED"
     ];
     for (const k of keys) {
       writePersistent("", k);
@@ -414,7 +443,7 @@ function handleInspectorRoute(url, config) {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
         project: "SAIR (国行 Apple 智能大模型重写模组)",
-        version: "1.1.0",
+        version: "1.2.0",
         client_runtime: detectClient(),
         message: "All persistent settings have been reset to module defaults.",
         timestamp: new Date().toISOString()
@@ -423,8 +452,8 @@ function handleInspectorRoute(url, config) {
     return true;
   }
 
-  // Route: /sair/config or /sair/status -> inspect or dynamically update configuration
-  if (url.includes("/sair/config") || url.includes("/sair/status")) {
+  // Route: /config or /status or dedicated host root -> inspect or dynamically update configuration
+  if (url.includes("/config") || url.includes("/status") || isDedicatedHost || isSairPath) {
     let updateNotice = null;
     const query = parseUrlQuery(url);
 
@@ -438,6 +467,8 @@ function handleInspectorRoute(url, config) {
       if (query.timeout_siri) { writePersistent(query.timeout_siri, "SAIR_TIMEOUT_SIRI"); updatedKeys.push("timeout_siri"); }
       if (query.timeout_writing) { writePersistent(query.timeout_writing, "SAIR_TIMEOUT_WRITING"); updatedKeys.push("timeout_writing"); }
       if (query.timeout_vision) { writePersistent(query.timeout_vision, "SAIR_TIMEOUT_VISION"); updatedKeys.push("timeout_vision"); }
+      if (query.siri_prompt !== undefined) { writePersistent(query.siri_prompt, "SAIR_SIRI_PROMPT"); updatedKeys.push("siri_prompt"); }
+      if (query.siri_persona_enabled !== undefined) { writePersistent(query.siri_persona_enabled, "SAIR_SIRI_PERSONA_ENABLED"); updatedKeys.push("siri_persona_enabled"); }
 
       if (updatedKeys.length > 0) {
         updateNotice = `Updated configuration keys via URL: ${updatedKeys.join(", ")}`;
@@ -449,9 +480,15 @@ function handleInspectorRoute(url, config) {
 
     const headers = getRequestHeaders();
     const accept = (headers.Accept || headers.accept || "").toLowerCase();
-    const wantsJson = query.format === "json" || (!accept.includes("text/html") && Object.keys(query).length > 0) || url.includes("/sair/status");
 
-    if (!wantsJson && (url.includes("/sair/config") || accept.includes("text/html"))) {
+    // Determine output format:
+    // Only return JSON if explicit format=json is specified, or hitting /sair/status without HTML Accept header
+    const isExplicitJson = query.format === "json";
+    const isStatusOnly = url.includes("/status") && !url.includes("/config") && !isDedicatedHost;
+    const isBrowserHtmlRequest = accept.includes("text/html") || query.format === "html";
+    const wantsJson = isExplicitJson || (isStatusOnly && !isBrowserHtmlRequest);
+
+    if (!wantsJson) {
       const html = renderWebConfigDashboard(activeConfig, clientRuntime, updateNotice);
       doneWithResponse({
         status: 200,
@@ -467,7 +504,7 @@ function handleInspectorRoute(url, config) {
 
     const responsePayload = {
       project: "SAIR (国行 Apple 智能大模型重写模组)",
-      version: "1.1.0",
+      version: "1.2.0",
       client_runtime: clientRuntime,
       active_configuration: safeConfig,
       timestamp: new Date().toISOString()
@@ -506,6 +543,8 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
   const timeoutSiri = parseInt(config.timeout_siri, 10) || 7;
   const timeoutWriting = parseInt(config.timeout_writing, 10) || 15;
   const timeoutVision = parseInt(config.timeout_vision, 10) || 10;
+  const siriPersonaChecked = config.siri_persona_enabled !== false ? "checked" : "";
+  const safeSiriPrompt = escapeHtml(config.siri_prompt || "");
   const noticeHtml = updateNotice ? `<div style="background:rgba(16,185,129,0.2);border:1px solid #10b981;padding:12px;border-radius:12px;margin-bottom:16px;font-size:13px;color:#10b981;">${escapeHtml(updateNotice)}</div>` : "";
 
   return `<!DOCTYPE html>
@@ -655,7 +694,24 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       display: flex;
       align-items: center;
     }
-    input[type="text"], input[type="password"], select {
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+      min-height: 96px;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea:focus { border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+    input[type="text"], input[type="password"], select, textarea {
       width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--input-border);
@@ -686,6 +742,24 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
+    .field-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .persona-presets-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .persona-chip {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.35);
+      color: #e9d5ff;
+    }
+    .persona-chip:active { background: rgba(168, 85, 247, 0.3); }
     .switch-row {
       display: flex;
       align-items: center;
@@ -844,6 +918,11 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     ${noticeHtml}
 
+    <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:12px;color:#38bdf8;line-height:1.5;">
+      💡 <b>贴心提示</b>：开箱即用，免配证书！随时通过 Safari 访问 <code>http://sair.box</code> 或 <code>http://sair.hub</code> 即可配置。<br />
+      Apple 智能与 Siri 的实际劫持需要 Surge 开启「MITM」并信任 CA 证书。
+    </div>
+
     <div class="card">
       <div class="section-title">快速供应商预设</div>
       <div class="presets-row">
@@ -871,6 +950,34 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         <div class="form-group">
           <label class="form-label" for="model">目标模型名称 (Model)</label>
           <input type="text" id="model" name="model" value="${safeModel}" placeholder="gpt-4o-mini" required />
+        </div>
+
+        <div class="section-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          🎭 Siri 专属人格提示词 (Persona System Prompt)
+        </div>
+
+        <div class="switch-row" style="margin-bottom: 12px;">
+          <div>
+            <div class="switch-label">启用 Siri 自定义人格</div>
+            <div class="switch-desc">仅在 Siri 对话问答中生效；写作工具与视觉识别保持严谨专业</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="siri_persona_enabled" name="siri_persona_enabled" ${siriPersonaChecked} />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="persona-presets-row">
+          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('sister')">🌸 妹系专属 ♡</button>
+          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('concise')">💼 极简高效专家</button>
+          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('tsundere')">🐱 傲娇幽默助手</button>
+          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('default')">🤖 官方千问风格</button>
+        </div>
+
+        <div class="form-group">
+          <textarea id="siri_prompt" name="siri_prompt" rows="5" placeholder="输入你想要设定的 Siri 人格系统提示词...">${safeSiriPrompt}</textarea>
+          <div class="field-hint">💡 提示：此提示词仅在 Siri 对话问答中生效；写作工具（改写/校对/总结）与视觉识别将继续保持专业严谨模式。建议在提示词中加上「避免使用动作括号和繁杂排版」，以确保 Siri 语音自然朗读不尴尬。</div>
         </div>
 
         <div class="form-group">
@@ -929,7 +1036,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     <div class="footer-links">
       <p>持久化存储将覆盖模块默认参数 · 适用于全客户端<br />
-      <a href="/sair/status" target="_blank">查看原始 JSON 状态 (/sair/status)</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
+      本地地址：<a href="http://sair.box">http://sair.box</a> · <a href="http://sair.hub">http://sair.hub</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
     </div>
   </div>
 
@@ -977,6 +1084,25 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       showToast("已填充 " + name + " 预设参数");
     }
 
+    function applyPersona(type) {
+      var promptEl = document.getElementById("siri_prompt");
+      var enabledEl = document.getElementById("siri_persona_enabled");
+      enabledEl.checked = true;
+      if (type === "sister" || type === "sair") {
+        promptEl.value = "你是由 Apple 智能调用的 SAIR 专属助手。你是用户熟悉、亲近、温柔可爱的 AI 妹妹，俏皮自然，偶尔调皮撒娇，说话带有一点点二次元少女感但不过度卖萌。请用自然、口语化的中文亲切回答。严禁输出任何动作描写括号（如括号动作）、特殊符号或复杂排版，保证语音朗读纯粹自然。";
+        showToast("已应用「妹系专属」人格设定 ♡");
+      } else if (type === "concise") {
+        promptEl.value = "你是由 Apple 智能调用的效率专家。请以极简、精准、一针见血的口语化语言回答用户问题，直接给出核心结论，切勿废话或多余铺垫，避免使用动作括号，适合语音直接播放。";
+        showToast("已应用「极简高效专家」人格预设");
+      } else if (type === "tsundere") {
+        promptEl.value = "你是由 Apple 智能调用的傲娇助手。你说话带一点点轻微傲娇和幽默吐槽，但内心很在乎用户，依然会认真帮忙解决问题。请使用生动的口语回答，禁止出现动作描写括号，适合语音播报。";
+        showToast("已应用「傲娇幽默助手」人格预设");
+      } else if (type === "default") {
+        promptEl.value = "你是由 Apple 智能 Siri 调用的千问助手。请直接、高质量、口语化地回答用户指令，重点突出，切勿输出多余开场白或客套话。避免使用动作描写括号，以便语音自然播报。";
+        showToast("已恢复「官方千问风格」默认预设");
+      }
+    }
+
     function saveConfig(e) {
       e.preventDefault();
       var btn = document.getElementById("btnSave");
@@ -992,6 +1118,8 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       params.append("timeout_siri", document.getElementById("timeout_siri").value.trim());
       params.append("timeout_writing", document.getElementById("timeout_writing").value.trim());
       params.append("timeout_vision", document.getElementById("timeout_vision").value.trim());
+      params.append("siri_persona_enabled", document.getElementById("siri_persona_enabled").checked ? "true" : "false");
+      params.append("siri_prompt", document.getElementById("siri_prompt").value.trim());
       params.append("format", "json");
 
       fetch("/sair/config?" + params.toString())
@@ -1423,9 +1551,21 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
     userContent = prompt;
   }
 
-  const systemPrompt = imageUrl
-    ? "你是由 Apple 智能 Siri 调用的视觉认知助手。请精准、简洁、口语化地识别图片并回答提问，重点突出，切勿多余开场白或客套话。"
-    : "你是由 Apple 智能 Siri 调用的千问助手。请直接、高质量、口语化地回答用户指令，重点突出，切勿输出多余开场白或客套话。";
+  // Adaptive Scenario-based System Prompt
+  let systemPrompt = "";
+  if (imageUrl || scenario === "vision") {
+    systemPrompt = "你是由 Apple 智能 Siri 调用的视觉认知助手。请精准、简洁、口语化地识别图片并回答提问，重点突出，切勿多余开场白或客套话。";
+  } else if (scenario === "writing") {
+    systemPrompt = "你是由 Apple 智能调用的文本处理与写作助手。请根据用户的指令严格对提供的文本进行校对、重写、润色或总结，保持专业、严谨与准确。";
+  } else {
+    // scenario === "siri" or general
+    const personaEnabled = config.siri_persona_enabled !== false;
+    if (personaEnabled && config.siri_prompt && config.siri_prompt.trim()) {
+      systemPrompt = config.siri_prompt.trim();
+    } else {
+      systemPrompt = "你是由 Apple 智能 Siri 调用的千问助手。请直接、高质量、口语化地回答用户指令，重点突出，切勿输出多余开场白或客套话。避免使用动作描写括号，以便语音自然播报。";
+    }
+  }
 
   const reqHeaders = { "Content-Type": "application/json" };
   if (config.api_key) {

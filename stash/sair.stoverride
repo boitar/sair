@@ -1,27 +1,46 @@
 name: SAIR - Siri-ously AI Router
-desc: 国行 Apple 智能大模型重写覆写规则：通过 Stash 规则覆写与双阶段脚本，将写作工具、Siri 问答与视觉智能透明重写为自定义大模型。
+desc: 国行 Apple 智能大模型重写覆写规则：通过 Stash 本地脚本重写，将写作工具、Siri 问答与视觉智能透明转接至自定义 OpenAI 兼容模型。安装后开启覆写，在 Safari 访问 http://sair.box 即可直达 Liquid Glass 控制台配置全部参数与人格设定。
 author: boitar
 homepage: https://github.com/boitar/sair
 
+hosts:
+  sair.box: 198.18.41.218
+  sair.hub: 198.18.41.219
+  sair.ai: 198.18.41.220
+
+rules:
+  - DOMAIN,sair.box,DIRECT
+  - DOMAIN,sair.hub,DIRECT
+  - DOMAIN,sair.ai,DIRECT
+  - DOMAIN-SUFFIX,sair.box,DIRECT
+  - DOMAIN-SUFFIX,sair.hub,DIRECT
+  - DOMAIN-SUFFIX,sair.ai,DIRECT
+
+http:
+  force-http-engine:
+    - "sair.box"
+    - "*.sair.box"
+    - "sair.hub"
+    - "*.sair.hub"
+    - "sair.ai"
+    - "*.sair.ai"
+
 mitm:
   - "prod-yabuli.qianwen.com"
+  - "sair.box"
+  - "*.sair.box"
+  - "sair.hub"
+  - "*.sair.hub"
+  - "sair.ai"
+  - "*.sair.ai"
 
 script:
-  - name: SAIR Inspector Request
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
+  - name: SAIR Dashboard
+    match: ^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$
     type: request
     require-body: false
     timeout: 15
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
-
-  - name: SAIR Inspector Response
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$
-    type: response
-    require-body: false
-    timeout: 15
-    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
 
   - name: SAIR Request
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -30,7 +49,6 @@ script:
     max-size: 16777216
     timeout: 60
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10
 
   - name: SAIR Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
@@ -39,4 +57,3 @@ script:
     max-size: 16777216
     timeout: 60
     script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-    argument: endpoint=https://api.openai.com/v1/chat/completions&api_key=&model=gpt-4o-mini&notify=error&fallback=true&timeout_siri=7&timeout_writing=15&timeout_vision=10

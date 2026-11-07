@@ -4,17 +4,23 @@
 # Homepage: https://github.com/boitar/sair
 #
 # 配置指南：
-# 导入本 Snippet 并开启 MITM 后，可直接在 Safari 中打开如下页面通过 Web 控制台可视化配置参数：
-# https://prod-yabuli.qianwen.com/sair/config
+# 导入本 Snippet 并开启 MITM 后，可在 Safari 中直接访问 http://sair.box 打开 Liquid Glass 控制台配置参数与人格设定。
 
 [rewrite_local]
-# Inspector endpoints: status check, models probe, and dynamic configuration
-^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$ url script-request-header https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-^https:\/\/prod-yabuli\.qianwen\.com\/sair\/(status|config|models|reset)(?:[/?].*)?$ url script-response-body https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+# SAIR Web Dashboard & Inspector Route (http://sair.box or http://sair.hub or https://prod-yabuli.qianwen.com/sair)
+^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$ url script-request-header https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
 # Apple Intelligence Dual-Hook Interception (Request Body Capture & Response SSE Rewrite)
 ^https:\/\/prod-yabuli\.qianwen\.com\/.* url script-request-body https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 ^https:\/\/prod-yabuli\.qianwen\.com\/.* url script-response-body https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
+[filter_local]
+host, sair.box, direct
+host, sair.hub, direct
+host, sair.ai, direct
+host-suffix, sair.box, direct
+host-suffix, sair.hub, direct
+host-suffix, sair.ai, direct
+
 [mitm]
-hostname = prod-yabuli.qianwen.com
+hostname = prod-yabuli.qianwen.com, sair.box, *.sair.box, sair.hub, *.sair.hub, sair.ai, *.sair.ai
