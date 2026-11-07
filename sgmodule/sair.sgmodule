@@ -25,9 +25,9 @@ hostname = %APPEND% prod-yabuli.qianwen.com, sair.box, *.sair.box, sair.hub, *.s
 
 [Script]
 # SAIR Web Dashboard & Inspector Route (http://sair.box or http://sair.hub)
-SAIR Dashboard = type=http-request,pattern=^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+SAIR Dashboard = type=http-request,pattern=^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$,requires-body=false,timeout=15,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
 # Apple Intelligence Interception Hooks
-SAIR Request = type=http-request,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/.*,requires-body=true,max-size=16777216,timeout=60,script-path=https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+SAIR Request = type=http-request,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/.*,requires-body=true,max-size=16777216,timeout=60,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
-SAIR Response = type=http-response,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/.*,requires-body=true,max-size=16777216,timeout=60,script-path=https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+SAIR Response = type=http-response,pattern=^https:\/\/prod-yabuli\.qianwen\.com\/.*,requires-body=true,max-size=16777216,timeout=60,script-path=https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js

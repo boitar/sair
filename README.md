@@ -112,24 +112,24 @@ sequenceDiagram
 
 你也可以直接使用各客户端专属的 **一键安装快捷 URL Scheme**（在 Safari、快捷指令或支持自定义 Scheme 的应用中触发）：
 
-| 客户端 | 快捷安装入口 (URL Scheme) | 手动直链下载 (GitHub Release) |
-| :--- | :--- | :--- |
-| **Surge** | [点击一键安装 Surge 模块](surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
-| **Loon** | [点击一键安装 Loon 插件](loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin` | [`sair.plugin`](https://github.com/boitar/sair/releases/latest/download/sair.plugin) |
-| **Stash** | [点击一键安装 Stash 覆写](stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride` | [`sair.stoverride`](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) |
-| **Egern** | [点击一键安装 Egern 模块](egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml` | [`sair.yaml`](https://github.com/boitar/sair/releases/latest/download/sair.yaml) |
-| **Quantumult X** | [点击一键安装 QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://github.com/boitar/sair/releases/latest/download/sair.snippet"]}` | [`sair.snippet`](https://github.com/boitar/sair/releases/latest/download/sair.snippet) |
-| **Shadowrocket** | [点击一键安装 Shadowrocket 模块](shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
+| 客户端 | 快捷安装入口 (URL Scheme · 支持一键无缝更新) | 手动直链配置 (GitHub Raw) | CDN 镜像 (Fastly jsDelivr) |
+| :--- | :--- | :--- | :--- |
+| **Surge** | [点击一键安装 Surge 模块](surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fsgmodule%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fsgmodule%2Fsair.sgmodule` | [`sair.sgmodule`](https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/sgmodule/sair.sgmodule) |
+| **Loon** | [点击一键安装 Loon 插件](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Floon%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Floon%2Fsair.plugin` | [`sair.plugin`](https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/loon/sair.plugin) |
+| **Stash** | [点击一键安装 Stash 覆写](stash://install-override?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fstash%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fstash%2Fsair.stoverride` | [`sair.stoverride`](https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/stash/sair.stoverride) |
+| **Egern** | [点击一键安装 Egern 模块](egern:///modules/new?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fegern%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fegern%2Fsair.yaml` | [`sair.yaml`](https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/egern/sair.yaml) |
+| **Quantumult X** | [点击一键安装 QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fquantumultx%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet"]}` | [`sair.snippet`](https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/quantumultx/sair.snippet) |
+| **Shadowrocket** | [点击一键安装 Shadowrocket 模块](shadowrocket://install?module=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fshadowrocket%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fraw.githubusercontent.com%2Fboitar%2Fsair%2Fmain%2Fshadowrocket%2Fsair.sgmodule` | [`sair.sgmodule`](https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule) | [`Fastly CDN`](https://fastly.jsdelivr.net/gh/boitar/sair@main/shadowrocket/sair.sgmodule) |
 
 ### 手动安装 Surge 模块
 
 **安装路径**：`首页 > 修改 > 模块 > 安装新模块`（或 `配置 > 模块 > 安装新模块`）
 
-**模块下载地址 (推荐 Release 直链)**：
+**模块下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
+https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/sgmodule/sair.sgmodule`)*
 
 模块会自动追加 MITM 主机名，并注册 SAIR 的请求与响应双阶段脚本。
 
@@ -137,11 +137,11 @@ https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
 
 **安装路径**：`配置 > 插件 > 插件`（右上角加号）
 
-**插件下载地址 (推荐 Release 直链)**：
+**插件下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.plugin
+https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/loon/sair.plugin`)*
 
 启用插件后，Loon 会显示 SAIR 的可调参数。
 
@@ -149,41 +149,41 @@ https://github.com/boitar/sair/releases/latest/download/sair.plugin
 
 **安装路径**：`首页 > 覆写 > 安装覆写`（或 `覆写 > 从 URL 下载`）
 
-**覆写下载地址 (推荐 Release 直链)**：
+**覆写下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.stoverride
+https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/stash/sair.stoverride`)*
 
 ### 手动安装 Shadowrocket 模块
 
 **安装路径**：`配置 > 模块 > 右上角加号`
 
-**模块下载地址 (推荐 Release 直链)**：
+**模块下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
+https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/shadowrocket/sair.sgmodule`)*
 
 ### 手动安装 Quantumult X Snippet
 
 **安装路径**：`重写 > 引用`（右上角加号添加远程资源）
 
-**Snippet 下载地址 (推荐 Release 直链)**：
+**Snippet 下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.snippet
+https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/quantumultx/sair.snippet`)*
 
 ### 手动安装 Egern 模块
 
 **安装路径**：`工具 > 模块`（右上角添加 / Add Module from URL）
 
-**模块下载地址 (推荐 Release 直链)**：
+**模块下载地址 (推荐 GitHub Raw，支持一键无缝更新)**：
 ```text
-https://github.com/boitar/sair/releases/latest/download/sair.yaml
+https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml
 ```
-*(备用 GitHub Raw：`https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml`)*
+*(备用 CDN 镜像：`https://fastly.jsdelivr.net/gh/boitar/sair@main/egern/sair.yaml`)*
 
 ### 配置模型网关
 
@@ -199,7 +199,7 @@ https://github.com/boitar/sair/releases/latest/download/sair.yaml
    ```
    *(备用回退地址：`https://prod-yabuli.qianwen.com/sair`)*
 
-   将呈现自包含的 Apple Liquid Glass 风格 Web 控制台，内置专属人格切换（🌸 nulre 妹系专属、💼 极简高效、🐱 傲娇陪伴、🤖 默认）、常用模型服务商预设（OpenAI、DeepSeek、Gemini、Moonshot、Ollama）、表单即时保存与上游模型列表探针，修改后自动写入持久化存储并立即生效，无需手动改写任何规则代码（Surge / Loon / Stash / Quantumult X / Shadowrocket / Egern 全平台通用）。
+   将呈现自包含的 Apple Liquid Glass 风格 Web 控制台，内置专属人格切换（🌸 妹系专属、💼 极简高效、🐱 傲娇陪伴、🤖 默认）、常用模型服务商预设（OpenAI、DeepSeek、Gemini、Moonshot、Ollama）、表单即时保存与上游模型列表探针，修改后自动写入持久化存储并立即生效，无需手动改写任何规则代码（Surge / Loon / Stash / Quantumult X / Shadowrocket / Egern 全平台通用）。
 
 如需清除持久化配置恢复模块默认值，可随时在控制台中点击重置，或在 Safari 访问：
 ```text

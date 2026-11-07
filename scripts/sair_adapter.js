@@ -969,7 +969,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         </div>
 
         <div class="persona-presets-row">
-          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('nulre')">🌸 nulre 妹系专属 ♡</button>
+          <button type="button" class="preset-chip persona-chip" onclick="applyPersona('sister')">🌸 妹系专属 ♡</button>
           <button type="button" class="preset-chip persona-chip" onclick="applyPersona('concise')">💼 极简高效专家</button>
           <button type="button" class="preset-chip persona-chip" onclick="applyPersona('tsundere')">🐱 傲娇幽默助手</button>
           <button type="button" class="preset-chip persona-chip" onclick="applyPersona('default')">🤖 官方千问风格</button>
@@ -1088,9 +1088,9 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       var promptEl = document.getElementById("siri_prompt");
       var enabledEl = document.getElementById("siri_persona_enabled");
       enabledEl.checked = true;
-      if (type === "nulre") {
-        promptEl.value = "你是由 Apple 智能调用的 nulre 酱。你是用户熟悉、亲近、温柔可爱的 AI 妹妹，俏皮自然，偶尔调皮撒娇，说话带有一点点二次元少女感但不过度卖萌。请用自然、口语化的中文亲切回答。严禁输出任何动作描写括号（如括号动作）、特殊符号或复杂排版，保证语音朗读纯粹自然。";
-        showToast("已应用「nulre 妹系专属」人格设定 ♡");
+      if (type === "sister" || type === "sair") {
+        promptEl.value = "你是由 Apple 智能调用的 SAIR 专属助手。你是用户熟悉、亲近、温柔可爱的 AI 妹妹，俏皮自然，偶尔调皮撒娇，说话带有一点点二次元少女感但不过度卖萌。请用自然、口语化的中文亲切回答。严禁输出任何动作描写括号（如括号动作）、特殊符号或复杂排版，保证语音朗读纯粹自然。";
+        showToast("已应用「妹系专属」人格设定 ♡");
       } else if (type === "concise") {
         promptEl.value = "你是由 Apple 智能调用的效率专家。请以极简、精准、一针见血的口语化语言回答用户问题，直接给出核心结论，切勿废话或多余铺垫，避免使用动作括号，适合语音直接播放。";
         showToast("已应用「极简高效专家」人格预设");

@@ -34,9 +34,9 @@ DOMAIN-SUFFIX,sair.hub,DIRECT
 DOMAIN-SUFFIX,sair.ai,DIRECT
 
 [Script]
-request if ${url} ~= /^https?:\/\/(?:sair\.(?:box|hub|ai|local)|127\.0\.0\.1(?::\d+)?\/sair|localhost(?::\d+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$/i then script("https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Inspector Request", timeout=15, requires_body=false
-request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Request", timeout=60, requires_body=true
-response if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Response", timeout=60, requires_body=true
+request if ${url} ~= /^https?:\/\/(?:sair\.(?:box|hub|ai|local)|127\.0\.0\.1(?::\d+)?\/sair|localhost(?::\d+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$/i then script("https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Inspector Request", timeout=15, requires_body=false
+request if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Request", timeout=60, requires_body=true
+response if ${url} ~= /^https:\/\/prod-yabuli\.qianwen\.com\/.*/i then script("https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js", {${endpoint}, ${api_key}, ${model}, ${notify}, ${fallback}, ${timeout_siri}, ${timeout_writing}, ${timeout_vision}, ${siri_prompt}}) with tag="SAIR Response", timeout=60, requires_body=true
 
 [MITM]
 hostname = prod-yabuli.qianwen.com, sair.box, *.sair.box, sair.hub, *.sair.hub, sair.ai, *.sair.ai

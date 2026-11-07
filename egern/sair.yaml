@@ -38,18 +38,18 @@ scriptings:
     type: request
     require_body: false
     timeout: 15
-    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
   - name: SAIR Request
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
     type: request
     require_body: true
     timeout: 60
-    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
 
   - name: SAIR Response
     match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
     type: response
     require_body: true
     timeout: 60
-    script_url: https://raw.githubusercontent.com/boitar/sair/custom/scripts/sair_adapter.js
+    script_url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
