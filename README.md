@@ -17,7 +17,7 @@
 
 <p align="center">
   <b>Your Intelligence. Your Models.</b><br />
-  专为中国大陆版 Apple 智能（iOS 27.3+）打造的轻量化、零依赖自定义大模型路由适配器
+  专为中国大陆版 Apple 智能（iOS 27.3+）打造的轻量化、零依赖自定义大模型请求重写插件与模组
 </p>
 
 <p align="center">
@@ -40,9 +40,13 @@
 
 ## 项目简介
 
-国行版 **Apple 智能（Apple Intelligence）** 在调用第三方扩展能力时，会由设备直接通过标准 TLS 1.3 连接请求阿里云通义千问网关（`prod-yabuli.qianwen.com`）。SAIR 利用这一网络特征，通过 **Surge、Loon、Stash、Shadowrocket、Quantumult X 或 Egern** 的双阶段脚本与重写规则，在设备本地完成透明拦截、请求转接和 SSE 回包重写。
+**SAIR** 本质上是一个面向主流代理客户端的**国行 Apple 智能请求重写与响应适配插件 / 模组**（而非网络层路由器）。
 
-安装完成后，系统级**写作工具**、**Siri 智能问答**和**视觉智能相机**仍然使用原生入口与交互界面，但底层生成模型可以切换到任意兼容 OpenAI `/v1/chat/completions` 的服务，包括 OpenAI、Gemini、Claude、DeepSeek、OpenRouter 以及自建 Ollama / vLLM 网关。
+国行版 **Apple 智能（Apple Intelligence）** 在调用第三方扩展能力时，会由系统通过标准 HTTPS 请求阿里云通义千问网关（`prod-yabuli.qianwen.com`）。SAIR 利用 **Surge、Loon、Stash、Shadowrocket、Quantumult X 与 Egern** 的本地中间人解密（MITM）与双阶段脚本重写能力，在设备本地透明完成：
+1. **请求拦截与协议转接**：捕获 Apple 智能发出的上下文、系统提示词与相机控制多模态图像，转换为标准的 OpenAI `/v1/chat/completions` 请求并转接至你指定的大模型 API；
+2. **响应伪造与流式重写**：将第三方模型返回的文本或流式响应，重新组装并伪造为符合国行 Apple 智能原生规范的 27 级 SSE 事件流与 JSON Schema 载荷后喂回系统。
+
+配置启用后，系统级**写作工具**、**Siri 智能问答**和**视觉智能相机**依然保持 100% 的原生系统交互与视觉动效，但底层大模型已完全透明替换为你偏好的 OpenAI、Gemini、Claude、DeepSeek、聚合 API 或本地自建模型。
 
 > [!TIP]
 > 想先体验功能，直接从[快速开始](#快速开始)开始；想了解完整数据契约和 27 级 SSE 状态机，再阅读 [`docs/protocol_analysis.md`](docs/protocol_analysis.md)。
@@ -306,7 +310,7 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 ```text
 SAIR/
 ├── assets/
-│   └── banner.svg              # README 头图与路由架构视觉
+│   └── banner.svg              # README 头图与重写架构视觉
 ├── docs/
 │   └── protocol_analysis.md    # 网络拓扑与 27 级 SSE 协议分析
 ├── scripts/

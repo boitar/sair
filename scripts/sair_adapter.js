@@ -1,6 +1,6 @@
 /**
- * SAIR (Siri-ously AI Router)
- * Universal Multi-Client Adapter Script for Apple Intelligence (iOS 27.3+)
+ * SAIR (国行 Apple 智能大模型重写模组)
+ * Universal Multi-Client Rewrite Script for Apple Intelligence (iOS 27.3+)
  * Compatible with Surge, Loon, Stash, Shadowrocket, Quantumult X, and Egern.
  * Repository: https://github.com/boitar/sair
  * License: MIT
@@ -413,7 +413,7 @@ function handleInspectorRoute(url, config) {
       status: 200,
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
-        project: "SAIR (Siri-ously AI Router)",
+        project: "SAIR (国行 Apple 智能大模型重写模组)",
         version: "1.1.0",
         client_runtime: detectClient(),
         message: "All persistent settings have been reset to module defaults.",
@@ -466,7 +466,7 @@ function handleInspectorRoute(url, config) {
     });
 
     const responsePayload = {
-      project: "SAIR (Siri-ously AI Router)",
+      project: "SAIR (国行 Apple 智能大模型重写模组)",
       version: "1.1.0",
       client_runtime: clientRuntime,
       active_configuration: safeConfig,
@@ -838,7 +838,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         <span>SAIR Inspector</span>
       </div>
       <h1 class="title">SAIR 参数控制台</h1>
-      <p class="subtitle">Siri-ously AI Router · 国行 Apple 智能模型路由</p>
+      <p class="subtitle">SAIR · 国行 Apple 智能大模型重写模组</p>
       <div><span class="client-tag">当前客户端：${escapeHtml(clientRuntime)}</span></div>
     </div>
 

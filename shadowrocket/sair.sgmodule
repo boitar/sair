@@ -1,5 +1,5 @@
 #!name=SAIR - Siri-ously AI Router
-#!desc=Route Apple Intelligence (iOS 27.3+) requests to your preferred LLM providers (OpenAI / Gemini / Claude / DeepSeek / Self-hosted) through Shadowrocket. Supports Writing Tools, Siri QA, and Visual Intelligence.
+#!desc=国行 Apple 智能大模型重写模块：通过 Shadowrocket 本地脚本重写，将写作工具、Siri 问答与视觉智能透明转接至自定义大模型。
 #!author=boitar
 #!homepage=https://github.com/boitar/sair
 #!category=AI / Automation
