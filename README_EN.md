@@ -5,12 +5,12 @@
 <br />
 
 [![Platform](https://img.shields.io/badge/iOS-27.3%2B-A855F7?style=flat-square&logo=apple&logoColor=white)](#prerequisites)
-[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true)
-[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true)
-[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true)
-[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true)
-[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true)
-[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true)
+[![Surge](https://img.shields.io/badge/Surge-Module-38BDF8?style=flat-square)](#manual-surge-module-installation)
+[![Loon](https://img.shields.io/badge/Loon-Plugin-8B5CF6?style=flat-square)](#manual-loon-plugin-installation)
+[![Stash](https://img.shields.io/badge/Stash-Override-10B981?style=flat-square)](#manual-stash-override-installation)
+[![Shadowrocket](https://img.shields.io/badge/Shadowrocket-Module-3B82F6?style=flat-square)](#manual-shadowrocket-module-installation)
+[![Quantumult X](https://img.shields.io/badge/Quantumult%20X-Snippet-E11D48?style=flat-square)](#manual-quantumult-x-snippet-installation)
+[![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](#manual-egern-module-installation)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#provider-configuration-examples)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
@@ -102,103 +102,84 @@ See [`docs/protocol_analysis.md`](docs/protocol_analysis.md) for the complete to
 
 ### One-click installation
 
-This is the recommended installation path.
+> [!TIP]
+> 🚀 **[Open Web Installation Portal (supports Safari one-click import into proxy apps)](https://boitar.github.io/sair/)**
+> Open the page in iOS Safari and tap any install button to trigger native client installation for Surge, Loon, Stash, Egern, Quantumult X, or Shadowrocket.
 
-The entries below open the import flow in the selected client. After importing, fill in the
-provider endpoint and API key in the module/plugin arguments, then enable MITM and certificate
-trust as required by the client.
+You can also trigger client import directly using the official **URL Scheme** links or copy the addresses:
 
-The one-click import entries use HTTPS raw links to the module/plugin files in this repository; the
-module and plugin load the adapter script from `main`.
-
-Using repository-relative HTTPS links keeps the entries clickable in GitHub-rendered pages.
-
-<table>
-  <thead>
-    <tr>
-      <th>Surge</th>
-      <th>Loon</th>
-      <th>Stash</th>
-      <th>Shadowrocket</th>
-      <th>Quantumult X</th>
-      <th>Egern</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true">Import the Surge module</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true">Import the Loon plugin</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true">Import Stash override</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true">Import Shadowrocket module</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true">Import QX snippet</a>
-      </td>
-      <td>
-        <a href="https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true">Import Egern module</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+| Client | Quick Import Scheme | Release Direct Download |
+| :--- | :--- | :--- |
+| **Surge** | [Install Surge Module](surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
+| **Loon** | [Install Loon Plugin](loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin)<br />`loon://import?plugin=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.plugin` | [`sair.plugin`](https://github.com/boitar/sair/releases/latest/download/sair.plugin) |
+| **Stash** | [Install Stash Override](stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride)<br />`stash://install-override?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.stoverride` | [`sair.stoverride`](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) |
+| **Egern** | [Install Egern Module](egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml)<br />`egern:///modules/new?url=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.yaml` | [`sair.yaml`](https://github.com/boitar/sair/releases/latest/download/sair.yaml) |
+| **Quantumult X** | [Install QX Snippet](quantumult-x:///add-resource?remote-resource=%7B%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.snippet%22%5D%7D)<br />`quantumult-x:///add-resource?remote-resource={"rewrite_remote":["https://github.com/boitar/sair/releases/latest/download/sair.snippet"]}` | [`sair.snippet`](https://github.com/boitar/sair/releases/latest/download/sair.snippet) |
+| **Shadowrocket** | [Install Shadowrocket Module](shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule)<br />`shadowrocket://install?module=https%3A%2F%2Fgithub.com%2Fboitar%2Fsair%2Freleases%2Flatest%2Fdownload%2Fsair.sgmodule` | [`sair.sgmodule`](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) |
 
 ### Manual Surge module installation
 
-Open **Modules → Install New Module** in Surge iOS and enter:
+**Path**: `Home > Modify > Modules > Install New Module`
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule
+https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/sgmodule/sair.sgmodule`)*
 
 The module adds the MITM hostname and registers SAIR's request and response hooks automatically.
 
 ### Manual Loon plugin installation
 
-Open **Plugins → Add Plugin** in Loon and enter:
+**Path**: `Configuration > Plugins > Plugins` (+ icon)
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin
+https://github.com/boitar/sair/releases/latest/download/sair.plugin
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/loon/sair.plugin`)*
 
 After enabling it, Loon will show the configurable SAIR arguments.
 
 ### Manual Stash override installation
 
-In Stash, go to **Overrides → Download from URL** and enter:
+**Path**: `Home > Overrides > Install Override`
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride
+https://github.com/boitar/sair/releases/latest/download/sair.stoverride
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/stash/sair.stoverride`)*
 
 ### Manual Shadowrocket module installation
 
-In Shadowrocket, navigate to **Config → Modules → Install from URL** and enter:
+**Path**: `Config > Modules > + (Add from URL)`
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule
+https://github.com/boitar/sair/releases/latest/download/sair.sgmodule
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/shadowrocket/sair.sgmodule`)*
 
 ### Manual Quantumult X snippet installation
 
-In Quantumult X, add the snippet under **Rewrite → Remote Resources** or paste it into your local configuration:
+**Path**: `Rewrite > Remote Resources` (+ icon)
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet
+https://github.com/boitar/sair/releases/latest/download/sair.snippet
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/quantumultx/sair.snippet`)*
 
 ### Manual Egern module installation
 
-In Egern, open **Modules → Add Module from URL** and enter:
+**Path**: `Tools > Modules > Add Module from URL`
 
+**Release Direct Download (Recommended)**:
 ```text
-https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml
+https://github.com/boitar/sair/releases/latest/download/sair.yaml
 ```
+*(Fallback GitHub Raw: `https://raw.githubusercontent.com/boitar/sair/main/egern/sair.yaml`)*
 
 ### Configure the model gateway
 
@@ -308,12 +289,12 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 | Client | Status | Import entry | Notes |
 | :--- | :---: | :--- | :--- |
-| **Surge** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/sgmodule/sair.sgmodule?raw=true) | Primary reference client with dual-phase interception, arguments UI, and 16MB body buffering. |
-| **Loon** | ✅ Full | [Import plugin](https://github.com/boitar/sair/blob/main/loon/sair.plugin?raw=true) | Dedicated plugin definition with native form UI arguments and dual-phase scripts. |
-| **Stash** | ✅ Full | [Import override](https://github.com/boitar/sair/blob/main/stash/sair.stoverride?raw=true) | Dedicated `.stoverride` definition with argument passing and 16MB multimodal buffer. |
-| **Shadowrocket** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/shadowrocket/sair.sgmodule?raw=true) | Dedicated module definition fully compatible with Surge module conventions. |
-| **Quantumult X** | ✅ Full | [Import snippet](https://github.com/boitar/sair/blob/main/quantumultx/sair.snippet?raw=true) | Dedicated `.snippet` with built-in `$task.fetch` / `$prefs` compatibility and Safari config portal. |
-| **Egern** | ✅ Full | [Import module](https://github.com/boitar/sair/blob/main/egern/sair.yaml?raw=true) | Dedicated YAML module definition supporting the `ctx` object model and storage. |
+| **Surge** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) | Primary reference client with dual-phase interception, arguments UI, and 16MB body buffering. |
+| **Loon** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.plugin) | Dedicated plugin definition with native form UI arguments and dual-phase scripts. |
+| **Stash** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.stoverride) | Dedicated `.stoverride` definition with argument passing and 16MB multimodal buffer. |
+| **Shadowrocket** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.sgmodule) | Dedicated module definition fully compatible with Surge module conventions. |
+| **Quantumult X** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.snippet) | Dedicated `.snippet` with built-in `$task.fetch` / `$prefs` compatibility and Safari config portal. |
+| **Egern** | ✅ Full | [One-click](#one-click-installation) · [Direct Download](https://github.com/boitar/sair/releases/latest/download/sair.yaml) | Dedicated YAML module definition supporting the `ctx` object model and storage. |
 
 - SAIR provides dedicated configuration packages across all 6 clients, backed by a unified cross-platform adapter script ([`scripts/sair_adapter.js`](scripts/sair_adapter.js)).
 - For clients without a native argument editing GUI (such as Quantumult X), settings can be updated in real time via Safari at `/sair/config?...`.
@@ -344,6 +325,7 @@ SAIR/
 │   └── sair.snippet            # Quantumult X rewrite snippet
 ├── egern/
 │   └── sair.yaml               # Egern YAML module definition
+├── index.html                  # Web installation portal (GitHub Pages)
 ├── LICENSE                     # MIT License
 ├── README.md                   # Primary Simplified Chinese documentation
 └── README_EN.md                # English documentation
