@@ -243,6 +243,17 @@ endpoint=https://openrouter.ai/api/v1/chat/completions&api_key=sk-or-v1-xxxx&mod
 
 ## 兼容性与已知限制
 
+### 客户端支持情况
+
+| 客户端 | 状态 | 导入入口 | 说明 |
+| :--- | :---: | :--- | :--- |
+| **Surge** | ✅ 完整支持 | [导入模块](sgmodule/sair.sgmodule?raw=true) | 当前主验证客户端，支持请求 / 响应双阶段和完整参数配置。 |
+| **Loon** | ✅ 完整支持 | [导入插件](loon/sair.plugin?raw=true) | 使用独立插件定义，参数对象和双阶段脚本已适配。 |
+| **Stash** | ◐ 部分支持 | [尝试导入 Surge 模块](sgmodule/sair.sgmodule?raw=true) | 脚本 API 接近 Surge，但当前没有 SAIR 的实机验收，不能保证模块生命周期和大请求体行为。 |
+| **Shadowrocket** | ◐ 部分支持 | — | 支持请求 / 响应脚本，但没有 SAIR 专用配置和完整验收，需自行调整规则并测试。 |
+| **Quantumult X** | ❌ 暂不支持 | — | 使用 `$task.fetch`、`$prefs` 等不同脚本 API，需要单独编写适配器。 |
+| **Egern** | ❌ 暂不支持 | — | 使用 `ctx` 对象和独立脚本配置格式，不能直接运行当前适配器。 |
+
 - SAIR 已提供 Surge iOS 5.x+ 模块和 Loon 3.5.1 (983)+ 插件，两者共用同一个双阶段适配脚本。
 - Loon 插件使用新版 Script 语法传入参数对象；如果使用更早版本的 Loon，请升级到插件声明的最低版本。
 - 系统必须仍能访问官方千问通道；SAIR 需要原始请求和 SSE 会话骨架来完成响应重写。
@@ -286,12 +297,11 @@ SAIR/
 </details>
 
 <details>
-<summary><b>3. 是否支持 Loon、Quantumult X 或 Stash？</b></summary>
+<summary><b>3. 哪些客户端可以直接使用？</b></summary>
 <br />
 
-当前版本已经提供 Loon 插件，直接安装 [`loon/sair.plugin`](loon/sair.plugin) 即可。Quantumult X 和 Stash
-仍需要自行迁移规则，并映射 [`scripts/sair_adapter.js`](scripts/sair_adapter.js) 使用的
-`$httpClient`、`$persistentStore` 与双阶段 `$done` 生命周期。
+Surge 和 Loon 可以直接使用；Stash、Shadowrocket 目前属于部分支持，需要自行验收；
+Quantumult X 和 Egern 暂不支持。具体边界见上方的客户端支持情况表。
 </details>
 
 ## 免责声明
