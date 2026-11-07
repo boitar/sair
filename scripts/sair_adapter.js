@@ -42,9 +42,9 @@ function getArgumentMap() {
     if (!key) continue;
     const rawValue = valueParts.join("=").trim();
     try {
-      result[key] = decodeURIComponent(rawValue);
+      result[key] = decodeURIComponent(rawValue.replace(/\+/g, " "));
     } catch (e) {
-      result[key] = rawValue;
+      result[key] = rawValue.replace(/\+/g, " ");
     }
   }
   return result;
@@ -194,6 +194,13 @@ function doneWithResponse(response) {
   }
 }
 
+function isTruthy(val) {
+  if (val === true || val === 1) return true;
+  if (!val) return false;
+  const s = String(val).trim().toLowerCase();
+  return s === "true" || s === "1" || s === "on" || s === "yes" || s === "enabled";
+}
+
 function isValidArg(val) {
   if (val === null || typeof val === "undefined") return false;
   const str = String(val).trim();
@@ -225,8 +232,7 @@ function getConfiguration() {
   if (isValidArg(argumentMap.model)) defaults.model = String(argumentMap.model);
   if (isValidArg(argumentMap.notify)) defaults.notify = String(argumentMap.notify).toLowerCase();
   if (isValidArg(argumentMap.fallback)) {
-    const fallbackValue = String(argumentMap.fallback).toLowerCase();
-    defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
+    defaults.fallback = isTruthy(argumentMap.fallback);
   }
   if (isValidArg(argumentMap.timeout_writing)) {
     defaults.timeout_writing = parseInt(argumentMap.timeout_writing, 10) || 15;
@@ -239,8 +245,7 @@ function getConfiguration() {
   }
   if (isValidArg(argumentMap.siri_prompt)) defaults.siri_prompt = String(argumentMap.siri_prompt);
   if (isValidArg(argumentMap.siri_persona_enabled)) {
-    const v = String(argumentMap.siri_persona_enabled).toLowerCase();
-    defaults.siri_persona_enabled = v === "true" || v === "1";
+    defaults.siri_persona_enabled = isTruthy(argumentMap.siri_persona_enabled);
   }
 
   // PersistentStore overrides (if set via custom UI or script)
@@ -254,8 +259,7 @@ function getConfiguration() {
   if (psNotify) defaults.notify = String(psNotify).toLowerCase();
   const psFallback = readPersistent("SAIR_FALLBACK");
   if (psFallback !== null && psFallback !== undefined) {
-    const fallbackValue = String(psFallback).toLowerCase();
-    defaults.fallback = fallbackValue === "true" || fallbackValue === "1";
+    defaults.fallback = isTruthy(psFallback);
   }
   const psTimeoutSiri = readPersistent("SAIR_TIMEOUT_SIRI");
   if (psTimeoutSiri) defaults.timeout_siri = parseInt(psTimeoutSiri, 10) || 7;
@@ -267,8 +271,7 @@ function getConfiguration() {
   if (psSiriPrompt !== null && psSiriPrompt !== undefined && psSiriPrompt !== "") defaults.siri_prompt = psSiriPrompt;
   const psPersonaEnabled = readPersistent("SAIR_SIRI_PERSONA_ENABLED");
   if (psPersonaEnabled !== null && psPersonaEnabled !== undefined) {
-    const v = String(psPersonaEnabled).toLowerCase();
-    defaults.siri_persona_enabled = v === "true" || v === "1";
+    defaults.siri_persona_enabled = isTruthy(psPersonaEnabled);
   }
 
   // Normalize endpoint URL: ensure /chat/completions is present if only base URL provided
@@ -425,19 +428,25 @@ function handleInspectorRoute(url, config) {
       return true;
     }
 
+    const modelHeaders = { "Content-Type": "application/json" };
+    if (targetApiKey) {
+      modelHeaders["Authorization"] = "Bearer " + targetApiKey;
+    }
+
     fetchHttp({
       method: "GET",
       url: modelsUrl,
-      headers: {
-        "Authorization": targetApiKey ? "Bearer " + targetApiKey : "",
-        "Content-Type": "application/json"
-      },
+      headers: modelHeaders,
       timeout: 12
     }, function(err, resp, data) {
       if (err || !data) {
         doneWithResponse({
           status: 502,
-          headers: { "Content-Type": "application/json; charset=utf-8" },
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Access-Control-Allow-Origin": "*"
+          },
           body: JSON.stringify({ error: "Failed to connect to provider /models", details: String(err), url: modelsUrl })
         });
         return;
@@ -461,7 +470,11 @@ function handleInspectorRoute(url, config) {
         modelList = modelList.filter(Boolean);
         doneWithResponse({
           status: 200,
-          headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Access-Control-Allow-Origin": "*"
+          },
           body: JSON.stringify({
             success: true,
             endpoint: modelsUrl,
@@ -493,7 +506,11 @@ function handleInspectorRoute(url, config) {
     }
     doneWithResponse({
       status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "Access-Control-Allow-Origin": "*"
+      },
       body: JSON.stringify({
         project: "SAIR (国行 Apple 智能大模型重写模组)",
         version: "1.2.0",
@@ -516,12 +533,20 @@ function handleInspectorRoute(url, config) {
       if (query.api_key !== undefined) { writePersistent(query.api_key, "SAIR_API_KEY"); updatedKeys.push("api_key"); }
       if (query.model) { writePersistent(query.model, "SAIR_MODEL"); updatedKeys.push("model"); }
       if (query.notify) { writePersistent(query.notify, "SAIR_NOTIFY"); updatedKeys.push("notify"); }
-      if (query.fallback !== undefined) { writePersistent(query.fallback, "SAIR_FALLBACK"); updatedKeys.push("fallback"); }
+      if (query.fallback !== undefined) {
+        const val = isTruthy(query.fallback) ? "true" : "false";
+        writePersistent(val, "SAIR_FALLBACK");
+        updatedKeys.push("fallback");
+      }
       if (query.timeout_siri) { writePersistent(query.timeout_siri, "SAIR_TIMEOUT_SIRI"); updatedKeys.push("timeout_siri"); }
       if (query.timeout_writing) { writePersistent(query.timeout_writing, "SAIR_TIMEOUT_WRITING"); updatedKeys.push("timeout_writing"); }
       if (query.timeout_vision) { writePersistent(query.timeout_vision, "SAIR_TIMEOUT_VISION"); updatedKeys.push("timeout_vision"); }
       if (query.siri_prompt !== undefined) { writePersistent(query.siri_prompt, "SAIR_SIRI_PROMPT"); updatedKeys.push("siri_prompt"); }
-      if (query.siri_persona_enabled !== undefined) { writePersistent(query.siri_persona_enabled, "SAIR_SIRI_PERSONA_ENABLED"); updatedKeys.push("siri_persona_enabled"); }
+      if (query.siri_persona_enabled !== undefined) {
+        const val = isTruthy(query.siri_persona_enabled) ? "true" : "false";
+        writePersistent(val, "SAIR_SIRI_PERSONA_ENABLED");
+        updatedKeys.push("siri_persona_enabled");
+      }
 
       if (updatedKeys.length > 0) {
         updateNotice = `Updated configuration keys via URL: ${updatedKeys.join(", ")}`;
@@ -545,7 +570,11 @@ function handleInspectorRoute(url, config) {
       const html = renderWebConfigDashboard(activeConfig, clientRuntime, updateNotice);
       doneWithResponse({
         status: 200,
-        headers: { "Content-Type": "text/html; charset=utf-8", "Access-Control-Allow-Origin": "*" },
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          "Access-Control-Allow-Origin": "*"
+        },
         body: html
       });
       return true;
@@ -1071,7 +1100,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         <button type="button" class="preset-chip" onclick="applyPreset('ollama')">🦙 Ollama (本地)</button>
       </div>
 
-      <form id="configForm" onsubmit="saveConfig(event)">
+      <form id="configForm" onsubmit="event.preventDefault(); saveConfig(event); return false;" action="javascript:void(0);">
         <div class="form-group">
           <label class="form-label" for="endpoint">上游接口地址 (Endpoint)</label>
           <input type="text" id="endpoint" name="endpoint" value="${safeEndpoint}" placeholder="https://api.openai.com/v1/chat/completions" required />
@@ -1088,7 +1117,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         <div class="form-group">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <label class="form-label" for="model" style="margin-bottom:0;">目标模型名称 (Model)</label>
-            <button type="button" class="btn-fetch-models" id="btnFetchModels" onclick="fetchModelsList()">
+            <button type="button" class="btn-fetch-models" id="btnFetchModels" onclick="fetchModelsList(event)">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
               获取所有模型
             </button>
@@ -1097,7 +1126,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
           <div id="modelSelectContainer" class="model-select-card" style="display:none;">
             <div class="model-select-header">
               <span id="modelCountLabel" style="font-size:12px; color:var(--text-muted); font-weight:600;">已获取可用模型</span>
-              <button type="button" class="btn-close-models" onclick="closeModelPicker()">收起</button>
+              <button type="button" class="btn-close-models" onclick="closeModelPicker(event)">收起</button>
             </div>
             <select id="modelDropdown" onchange="onModelDropdownSelected(this.value)">
               <option value="">-- 点击选择模型或从下方快速选择 --</option>
@@ -1172,11 +1201,11 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
         </div>
 
         <div class="btn-row">
-          <button type="submit" class="btn btn-primary" id="btnSave">
+          <button type="button" class="btn btn-primary" id="btnSave" onclick="saveConfig(event)">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
             保存配置并立即生效
           </button>
-          <button type="button" class="btn btn-secondary" onclick="probeModels()">
+          <button type="button" class="btn btn-secondary" onclick="fetchModelsList(event)">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             获取并选择上游模型列表 (/sair/models)
           </button>
@@ -1259,7 +1288,10 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
     }
 
     function saveConfig(e) {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
       var btn = document.getElementById("btnSave");
       btn.disabled = true;
       btn.innerText = "正在保存并生效...";
@@ -1295,7 +1327,15 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       fetchModelsList();
     }
 
-    function fetchModelsList() {
+    function probeModels(e) {
+      fetchModelsList(e);
+    }
+
+    function fetchModelsList(e) {
+      if (e) {
+        e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
       var ep = document.getElementById("endpoint").value.trim();
       var key = document.getElementById("api_key").value.trim();
       var btn = document.getElementById("btnFetchModels");
@@ -1308,19 +1348,28 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       if (!ep) {
         showToast("请先填写上游接口地址 (Endpoint)", true);
         document.getElementById("endpoint").focus();
-        return;
+        return false;
       }
 
       btn.disabled = true;
       var originalBtnHtml = btn.innerHTML;
       btn.innerHTML = '<svg width="13" height="13" class="spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0110 10" stroke-linecap="round"></path></svg> 拉取中...';
 
-      var fetchUrl = "/sair/models?endpoint=" + encodeURIComponent(ep) + "&api_key=" + encodeURIComponent(key);
+      var fetchUrl = "/sair/models?endpoint=" + encodeURIComponent(ep) + "&api_key=" + encodeURIComponent(key) + "&_t=" + Date.now();
 
       fetch(fetchUrl)
         .then(function(resp) {
           if (!resp.ok) {
-            throw new Error("HTTP " + resp.status + " " + resp.statusText);
+            return resp.text().then(function(t) {
+              var errMsg = "HTTP " + resp.status;
+              try {
+                var j = JSON.parse(t);
+                if (j.error) errMsg += ": " + (j.details || j.error);
+              } catch(ignore) {
+                if (t) errMsg += ": " + t.slice(0, 100);
+              }
+              throw new Error(errMsg);
+            });
           }
           return resp.json();
         })
@@ -1402,8 +1451,10 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
       showToast("已选择模型: " + selectedVal);
     }
 
-    function closeModelPicker() {
+    function closeModelPicker(e) {
+      if (e) e.preventDefault();
       document.getElementById("modelSelectContainer").style.display = "none";
+      return false;
     }
 
     function resetConfig() {
