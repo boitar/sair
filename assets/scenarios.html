@@ -13,9 +13,9 @@
   body {
     width: 1600px;
     height: 1020px;
-    background: #070913;
+    background: #FAF7F2;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    color: #F8FAFC;
+    color: #1C1917;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -24,34 +24,34 @@
     padding: 44px 56px 40px;
   }
 
-  /* 背景环境光晕 */
-  .glow-top-left {
-    position: absolute;
-    top: -160px;
-    left: -120px;
-    width: 650px;
-    height: 550px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(168, 85, 247, 0) 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .glow-top-right {
+  /* 温暖的自然环境底色与光晕 */
+  .ambient-top-left {
     position: absolute;
     top: -140px;
-    right: -100px;
+    left: -100px;
     width: 600px;
     height: 500px;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 70%);
+    background: radial-gradient(circle, rgba(234, 179, 8, 0.08) 0%, rgba(245, 158, 11, 0) 70%);
     pointer-events: none;
     z-index: 0;
   }
-  .glow-bottom {
+  .ambient-top-right {
     position: absolute;
-    bottom: -180px;
-    left: 30%;
-    width: 750px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.16) 0%, rgba(236, 72, 153, 0) 70%);
+    top: -120px;
+    right: -80px;
+    width: 580px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.07) 0%, rgba(168, 85, 247, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ambient-bottom {
+    position: absolute;
+    bottom: -160px;
+    left: 35%;
+    width: 700px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, rgba(56, 189, 248, 0) 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -59,8 +59,8 @@
     position: absolute;
     inset: 0;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
     background-size: 32px 32px;
     pointer-events: none;
     z-index: 0;
@@ -84,27 +84,24 @@
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.07);
     border-radius: 999px;
-    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     width: fit-content;
   }
   .brand-badge-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #A855F7, #EC4899, #38BDF8);
-    box-shadow: 0 0 10px #EC4899;
+    background: linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B);
   }
   .brand-badge-text {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    background: linear-gradient(90deg, #E2E8F0, #CBD5E1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #57534E;
   }
   .title-row {
     display: flex;
@@ -115,19 +112,17 @@
     font-size: 34px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #FFFFFF 20%, #E2E8F0 60%, #94A3B8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #1C1917;
   }
   .title-gradient-pill {
-    background: linear-gradient(90deg, #C084FC, #F472B6, #FB923C);
+    background: linear-gradient(90deg, #7C3AED, #DB2777, #EA580C);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
   }
   .subtitle {
     font-size: 15px;
-    color: #94A3B8;
+    color: #78716C;
     letter-spacing: 0.2px;
   }
   .header-right {
@@ -140,17 +135,18 @@
     align-items: center;
     gap: 6px;
     padding: 7px 14px;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.07);
     border-radius: 12px;
     font-size: 12.5px;
-    color: #CBD5E1;
-    font-weight: 500;
+    color: #44403C;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   }
   .status-tag.accent {
-    border-color: rgba(234, 88, 12, 0.4);
-    background: rgba(234, 88, 12, 0.12);
-    color: #FDBA74;
+    border-color: rgba(234, 88, 12, 0.25);
+    background: #FFF7ED;
+    color: #C2410C;
   }
 
   /* 2x2 场景卡片容器 */
@@ -164,19 +160,17 @@
   }
 
   .card {
-    background: rgba(18, 22, 38, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 22px;
     padding: 24px 26px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    backdrop-filter: blur(24px);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
     position: relative;
     overflow: hidden;
   }
-  /* 卡片顶部高光微光 */
   .card::before {
     content: "";
     position: absolute;
@@ -184,7 +178,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 10%, rgba(255, 255, 255, 0.18) 50%, transparent 90%);
+    background: linear-gradient(90deg, transparent 5%, rgba(0, 0, 0, 0.04) 50%, transparent 95%);
   }
 
   .card-header {
@@ -208,35 +202,31 @@
     font-size: 22px;
   }
   .icon-siri {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25));
-    border: 1px solid rgba(216, 180, 254, 0.3);
-    box-shadow: 0 0 18px rgba(168, 85, 247, 0.2);
+    background: #FAF5FF;
+    border: 1px solid #E9D5FF;
   }
   .icon-write {
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(59, 130, 246, 0.25));
-    border: 1px solid rgba(125, 211, 252, 0.3);
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.2);
+    background: #F0F9FF;
+    border: 1px solid #BAE6FD;
   }
   .icon-vision {
-    background: linear-gradient(135deg, rgba(251, 146, 60, 0.25), rgba(244, 63, 94, 0.25));
-    border: 1px solid rgba(253, 186, 116, 0.3);
-    box-shadow: 0 0 18px rgba(251, 146, 60, 0.2);
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
   }
   .icon-console {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.25));
-    border: 1px solid rgba(110, 231, 183, 0.3);
-    box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
   }
 
   .card-title {
     font-size: 20px;
     font-weight: 700;
-    color: #F1F5F9;
+    color: #1C1917;
     letter-spacing: -0.2px;
   }
   .card-desc {
     font-size: 13px;
-    color: #94A3B8;
+    color: #78716C;
     margin-top: 2px;
   }
 
@@ -249,30 +239,30 @@
     white-space: nowrap;
   }
   .pill-purple {
-    background: rgba(168, 85, 247, 0.15);
-    border: 1px solid rgba(168, 85, 247, 0.35);
-    color: #E9D5FF;
+    background: #F3E8FF;
+    border: 1px solid #D8B4FE;
+    color: #7E22CE;
   }
   .pill-blue {
-    background: rgba(56, 189, 248, 0.15);
-    border: 1px solid rgba(56, 189, 248, 0.35);
-    color: #BAE6FD;
+    background: #E0F2FE;
+    border: 1px solid #7DD3FC;
+    color: #0369A1;
   }
   .pill-orange {
-    background: rgba(251, 146, 60, 0.15);
-    border: 1px solid rgba(251, 146, 60, 0.35);
-    color: #FED7AA;
+    background: #FFEDD5;
+    border: 1px solid #FDBA74;
+    color: #C2410C;
   }
   .pill-green {
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #A7F3D0;
+    background: #DCFCE7;
+    border: 1px solid #86EFAC;
+    color: #15803D;
   }
 
-  /* 模拟交互小画板 (Mockup Box) */
+  /* 模拟交互小画板 (Mockup Box) - 米白内嵌纸质风格 */
   .mockup-box {
-    background: rgba(10, 14, 26, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #F8F5EE;
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 14px;
     padding: 13px 16px;
     margin-bottom: 14px;
@@ -296,11 +286,11 @@
     text-transform: uppercase;
   }
   .badge-user {
-    background: rgba(255, 255, 255, 0.12);
-    color: #CBD5E1;
+    background: #E7E5E4;
+    color: #44403C;
   }
   .badge-model {
-    background: linear-gradient(90deg, #A855F7, #EC4899);
+    background: linear-gradient(90deg, #8B5CF6, #EC4899);
     color: #FFFFFF;
   }
   .badge-model-claude {
@@ -317,16 +307,16 @@
   }
 
   .chat-text-strike {
-    color: #64748B;
+    color: #A8A29E;
     text-decoration: line-through;
     margin-right: 4px;
   }
   .chat-text-active {
-    color: #F8FAFC;
-    font-weight: 500;
+    color: #1C1917;
+    font-weight: 600;
   }
   .chat-text-reply {
-    color: #E2E8F0;
+    color: #44403C;
     font-size: 12px;
   }
 
@@ -336,31 +326,33 @@
     gap: 6px;
     align-items: center;
     padding: 5px 8px;
-    background: rgba(255, 255, 255, 0.07);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 8px;
     width: fit-content;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   }
   .wt-item {
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 5px;
-    color: #94A3B8;
+    color: #78716C;
   }
   .wt-item.active {
-    background: #38BDF8;
-    color: #041226;
+    background: #0284C7;
+    color: #FFFFFF;
     font-weight: 700;
   }
   .diff-del {
-    color: #EF4444;
+    color: #DC2626;
     text-decoration: line-through;
-    background: rgba(239, 68, 68, 0.15);
+    background: #FEE2E2;
     padding: 0 4px;
     border-radius: 3px;
   }
   .diff-add {
-    color: #10B981;
-    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    background: #D1FAE5;
     padding: 0 4px;
     border-radius: 3px;
     font-weight: 600;
@@ -372,24 +364,26 @@
     align-items: center;
     gap: 8px;
     padding: 4px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 8px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 11.5px;
-    color: #38BDF8;
+    color: #0284C7;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   }
   .model-chip-mock {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 3px 8px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: #DCFCE7;
+    border: 1px solid #86EFAC;
     border-radius: 6px;
     font-size: 11px;
-    color: #6EE7B7;
+    color: #15803D;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 600;
   }
 
   /* 核心特性清单 */
@@ -412,31 +406,31 @@
     margin-top: 6px;
     flex-shrink: 0;
   }
-  .bullet-purple { background: #C084FC; box-shadow: 0 0 6px #C084FC; }
-  .bullet-blue { background: #38BDF8; box-shadow: 0 0 6px #38BDF8; }
-  .bullet-orange { background: #FB923C; box-shadow: 0 0 6px #FB923C; }
-  .bullet-green { background: #34D399; box-shadow: 0 0 6px #34D399; }
+  .bullet-purple { background: #9333EA; }
+  .bullet-blue { background: #0284C7; }
+  .bullet-orange { background: #EA580C; }
+  .bullet-green { background: #16A34A; }
 
   .feature-title {
     font-weight: 700;
-    color: #F1F5F9;
+    color: #1C1917;
   }
   .feature-desc {
-    color: #94A3B8;
+    color: #57534E;
   }
 
   /* 底部流程链路栏 */
   .footer-pipeline {
     position: relative;
     z-index: 1;
-    background: rgba(15, 20, 35, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.07);
     border-radius: 18px;
     padding: 14px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   }
 
   .flow-nodes {
@@ -449,22 +443,22 @@
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #F8F5EE;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
-    color: #E2E8F0;
+    color: #292524;
   }
   .flow-node.highlight {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(56, 189, 248, 0.2));
-    border-color: rgba(216, 180, 254, 0.4);
-    color: #FFFFFF;
-    box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+    background: linear-gradient(135deg, #F3E8FF, #E0F2FE);
+    border-color: #C084FC;
+    color: #4C1D95;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.12);
   }
   .flow-arrow {
     font-size: 14px;
-    color: #64748B;
+    color: #A8A29E;
     font-weight: 700;
   }
 
@@ -473,25 +467,25 @@
     align-items: center;
     gap: 14px;
     font-size: 13px;
-    color: #94A3B8;
+    color: #78716C;
   }
   .meta-divider {
     width: 1px;
     height: 14px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.1);
   }
   .meta-tag {
-    color: #CBD5E1;
-    font-weight: 500;
+    color: #44403C;
+    font-weight: 600;
   }
 </style>
 </head>
 <body>
 
   <!-- 光晕层 -->
-  <div class="glow-top-left"></div>
-  <div class="glow-top-right"></div>
-  <div class="glow-bottom"></div>
+  <div class="ambient-top-left"></div>
+  <div class="ambient-top-right"></div>
+  <div class="ambient-bottom"></div>
   <div class="grid-pattern"></div>
 
   <!-- 顶部 Header -->
@@ -623,7 +617,7 @@
         <div class="mockup-box">
           <div class="chat-row">
             <span class="chat-badge badge-model-vision">相机捕捉</span>
-            <span style="color: #FDBA74; font-family: monospace;">[高清晰度电路板微距画面.jpg]</span>
+            <span style="color: #EA580C; font-family: monospace; font-weight: 600;">[高清晰度电路板微距画面.jpg]</span>
             <span class="chat-text-active">“这块板子为什么不通电？”</span>
           </div>
           <div class="chat-row">
@@ -667,7 +661,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="address-bar-mock">
               <span>🔒 http://sair.box</span>
-              <span style="color: #64748B;">(Fake-IP 直达)</span>
+              <span style="color: #78716C;">(Fake-IP 直达)</span>
             </div>
             <div class="model-chip-mock">
               <span>● 探针 182ms</span>
@@ -675,8 +669,8 @@
           </div>
           <div class="chat-row" style="margin-top: 2px;">
             <span class="chat-badge badge-model-console">已选模型</span>
-            <span style="font-family: monospace; font-size: 11.5px; color: #E2E8F0;">auto/gemini-3.8-flash</span>
-            <span style="color: #38BDF8; font-size: 11px; margin-left: auto;">[ 🔍 一键拉取所有模型 ]</span>
+            <span style="font-family: ui-monospace, monospace; font-size: 11.5px; color: #1C1917; font-weight: 600;">auto/gemini-3.8-flash</span>
+            <span style="color: #0284C7; font-size: 11px; margin-left: auto; font-weight: 600;">[ 🔍 一键拉取所有模型 ]</span>
           </div>
         </div>
       </div>
