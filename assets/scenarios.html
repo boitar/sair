@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    width: 1600px;
+    height: 1020px;
+    background: #070913;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #F8FAFC;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 56px 40px;
+  }
+
+  /* 背景环境光晕 */
+  .glow-top-left {
+    position: absolute;
+    top: -160px;
+    left: -120px;
+    width: 650px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(168, 85, 247, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-top-right {
+    position: absolute;
+    top: -140px;
+    right: -100px;
+    width: 600px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-bottom {
+    position: absolute;
+    bottom: -180px;
+    left: 30%;
+    width: 750px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.16) 0%, rgba(236, 72, 153, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 顶部 Header */
+  .header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+    width: fit-content;
+  }
+  .brand-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #A855F7, #EC4899, #38BDF8);
+    box-shadow: 0 0 10px #EC4899;
+  }
+  .brand-badge-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #E2E8F0, #CBD5E1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #FFFFFF 20%, #E2E8F0 60%, #94A3B8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title-gradient-pill {
+    background: linear-gradient(90deg, #C084FC, #F472B6, #FB923C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: #94A3B8;
+    letter-spacing: 0.2px;
+  }
+  .header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 12.5px;
+    color: #CBD5E1;
+    font-weight: 500;
+  }
+  .status-tag.accent {
+    border-color: rgba(234, 88, 12, 0.4);
+    background: rgba(234, 88, 12, 0.12);
+    color: #FDBA74;
+  }
+
+  /* 2x2 场景卡片容器 */
+  .grid-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 18px 0;
+  }
+
+  .card {
+    background: rgba(18, 22, 38, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    padding: 24px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  /* 卡片顶部高光微光 */
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, rgba(255, 255, 255, 0.18) 50%, transparent 90%);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .icon-siri {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25));
+    border: 1px solid rgba(216, 180, 254, 0.3);
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.2);
+  }
+  .icon-write {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(59, 130, 246, 0.25));
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.2);
+  }
+  .icon-vision {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.25), rgba(244, 63, 94, 0.25));
+    border: 1px solid rgba(253, 186, 116, 0.3);
+    box-shadow: 0 0 18px rgba(251, 146, 60, 0.2);
+  }
+  .icon-console {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.25));
+    border: 1px solid rgba(110, 231, 183, 0.3);
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #F1F5F9;
+    letter-spacing: -0.2px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: #94A3B8;
+    margin-top: 2px;
+  }
+
+  .pill-trigger {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .pill-purple {
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: #E9D5FF;
+  }
+  .pill-blue {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #BAE6FD;
+  }
+  .pill-orange {
+    background: rgba(251, 146, 60, 0.15);
+    border: 1px solid rgba(251, 146, 60, 0.35);
+    color: #FED7AA;
+  }
+  .pill-green {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #A7F3D0;
+  }
+
+  /* 模拟交互小画板 (Mockup Box) */
+  .mockup-box {
+    background: rgba(10, 14, 26, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 13px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .chat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chat-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+  .badge-user {
+    background: rgba(255, 255, 255, 0.12);
+    color: #CBD5E1;
+  }
+  .badge-model {
+    background: linear-gradient(90deg, #A855F7, #EC4899);
+    color: #FFFFFF;
+  }
+  .badge-model-claude {
+    background: linear-gradient(90deg, #D97706, #EA580C);
+    color: #FFFFFF;
+  }
+  .badge-model-vision {
+    background: linear-gradient(90deg, #0284C7, #0D9488);
+    color: #FFFFFF;
+  }
+  .badge-model-console {
+    background: linear-gradient(90deg, #059669, #0284C7);
+    color: #FFFFFF;
+  }
+
+  .chat-text-strike {
+    color: #64748B;
+    text-decoration: line-through;
+    margin-right: 4px;
+  }
+  .chat-text-active {
+    color: #F8FAFC;
+    font-weight: 500;
+  }
+  .chat-text-reply {
+    color: #E2E8F0;
+    font-size: 12px;
+  }
+
+  /* 拟真 Writing Tools 工具条 */
+  .writing-tools-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 5px 8px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    width: fit-content;
+  }
+  .wt-item {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    color: #94A3B8;
+  }
+  .wt-item.active {
+    background: #38BDF8;
+    color: #041226;
+    font-weight: 700;
+  }
+  .diff-del {
+    color: #EF4444;
+    text-decoration: line-through;
+    background: rgba(239, 68, 68, 0.15);
+    padding: 0 4px;
+    border-radius: 3px;
+  }
+  .diff-add {
+    color: #10B981;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  /* 拟真控制台地址栏 */
+  .address-bar-mock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    color: #38BDF8;
+  }
+  .model-chip-mock {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #6EE7B7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* 核心特性清单 */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .feature-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .bullet-purple { background: #C084FC; box-shadow: 0 0 6px #C084FC; }
+  .bullet-blue { background: #38BDF8; box-shadow: 0 0 6px #38BDF8; }
+  .bullet-orange { background: #FB923C; box-shadow: 0 0 6px #FB923C; }
+  .bullet-green { background: #34D399; box-shadow: 0 0 6px #34D399; }
+
+  .feature-title {
+    font-weight: 700;
+    color: #F1F5F9;
+  }
+  .feature-desc {
+    color: #94A3B8;
+  }
+
+  /* 底部流程链路栏 */
+  .footer-pipeline {
+    position: relative;
+    z-index: 1;
+    background: rgba(15, 20, 35, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(20px);
+  }
+
+  .flow-nodes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .flow-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #E2E8F0;
+  }
+  .flow-node.highlight {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(56, 189, 248, 0.2));
+    border-color: rgba(216, 180, 254, 0.4);
+    color: #FFFFFF;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+  }
+  .flow-arrow {
+    font-size: 14px;
+    color: #64748B;
+    font-weight: 700;
+  }
+
+  .footer-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    color: #94A3B8;
+  }
+  .meta-divider {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .meta-tag {
+    color: #CBD5E1;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 光晕层 -->
+  <div class="glow-top-left"></div>
+  <div class="glow-top-right"></div>
+  <div class="glow-bottom"></div>
+  <div class="grid-pattern"></div>
+
+  <!-- 顶部 Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand-badge">
+        <div class="brand-badge-dot"></div>
+        <span class="brand-badge-text">SAIR · Siri-ously AI Router</span>
+      </div>
+      <div class="title-row">
+        <h1>国行 Apple Intelligence × 任意大模型 · <span class="title-gradient-pill">四大核心场景</span></h1>
+      </div>
+      <div class="subtitle">无缝接管原生调用 · 自动滤除多余唤醒词 · 专属人格注入 · 全客户端可视控制台</div>
+    </div>
+    <div class="header-right">
+      <div class="status-tag"> iOS 27.3+ 验证</div>
+      <div class="status-tag">⚡ 纯代理 / 零越狱</div>
+      <div class="status-tag accent">🐧 LINUX DO 开源认证</div>
+    </div>
+  </div>
+
+  <!-- 2x2 核心场景卡片 -->
+  <div class="grid-container">
+
+    <!-- 场景 1: Siri 交互 -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon-wrap icon-siri">🎙️</div>
+            <div>
+              <div class="card-title">Siri 深度对话与自定义人格</div>
+              <div class="card-desc">电源键长按 / 语音呼叫 · 突破原生千问体验</div>
+            </div>
+          </div>
+          <div class="pill-trigger pill-purple">长按电源键 / 语音唤醒</div>
+        </div>
+
+        <div class="mockup-box">
+          <div class="chat-row">
+            <span class="chat-badge badge-user">用户语音</span>
+            <span class="chat-text-strike">问问千问，</span>
+            <span class="chat-text-active">这道并发算法题怎么用 Rust 写最优解？</span>
+          </div>
+          <div class="chat-row">
+            <span class="chat-badge badge-model">Claude 3.7 / R1</span>
+            <span class="chat-text-reply">可以使用 crossbeam 通道配合无锁 Atomic 队列...（附完整注释代码）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-bullet bullet-purple"></div>
+          <div><span class="feature-title">无感剥离触发词：</span><span class="feature-desc">转发前智能正则滤除“问问千问 / 帮我问千问”，还原纯粹对话。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-purple"></div>
+          <div><span class="feature-title">多变人格随心定制：</span><span class="feature-desc">内置妹系专属 ♡、极客开发搭子、苏格拉底导师，或自由填入 System Prompt。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-purple"></div>
+          <div><span class="feature-title">优雅超时熔断回退：</span><span class="feature-desc">上游大模型超长耗时或异常时，7s 自动无感降级到千问官方，从不假死。</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 场景 2: 系统写作工具 -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon-wrap icon-write">✍️</div>
+            <div>
+              <div class="card-title">系统级全局写作工具 (Writing Tools)</div>
+              <div class="card-desc">备忘录 / 邮件 / 微信 / 任意文本选区即选即改</div>
+            </div>
+          </div>
+          <div class="pill-trigger pill-blue">选中文本 · 点击写作工具</div>
+        </div>
+
+        <div class="mockup-box">
+          <div class="writing-tools-bar">
+            <span class="wt-item">校对 (Proofread)</span>
+            <span class="wt-item active">重写 (Rewrite) · 专业</span>
+            <span class="wt-item">总结 (Summary)</span>
+            <span class="wt-item">表格化</span>
+          </div>
+          <div class="chat-row" style="margin-top: 4px;">
+            <span class="chat-badge badge-model-claude">原生差异对比</span>
+            <span style="font-size: 12px;">
+              <span class="diff-del">这周代码差不多弄完了</span>
+              <span class="diff-add">本周核心模块与端到端回归已按期高质量完成交付。</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-bullet bullet-blue"></div>
+          <div><span class="feature-title">全套原生指令接管：</span><span class="feature-desc">无缝适配润色、风格改写（专业/友好/精简）、要点总结与表格提取。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-blue"></div>
+          <div><span class="feature-title">高精差异比对 (Refinements)：</span><span class="feature-desc">保留苹果原厂逐字高亮 diff 替换弹窗，享受顶级模型笔力。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-blue"></div>
+          <div><span class="feature-title">无语言与风格限制：</span><span class="feature-desc">打破原生仅中文简略重写瓶颈，中英双语润色、多语种学术润色一气呵成。</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 场景 3: 视觉智能 -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon-wrap icon-vision">📷</div>
+            <div>
+              <div class="card-title">视觉智能与多模态分析 (Visual AI)</div>
+              <div class="card-desc">相机控制键拍照 / 屏幕取词 · 现实世界图文解惑</div>
+            </div>
+          </div>
+          <div class="pill-trigger pill-orange">相机控制键 / 截屏提问</div>
+        </div>
+
+        <div class="mockup-box">
+          <div class="chat-row">
+            <span class="chat-badge badge-model-vision">相机捕捉</span>
+            <span style="color: #FDBA74; font-family: monospace;">[高清晰度电路板微距画面.jpg]</span>
+            <span class="chat-text-active">“这块板子为什么不通电？”</span>
+          </div>
+          <div class="chat-row">
+            <span class="chat-badge badge-model">Gemini 1.5 Pro</span>
+            <span class="chat-text-reply">图示 C12 贴片滤波电容表面有明显击穿裂纹，并伴随焊盘氧化断路...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-bullet bullet-orange"></div>
+          <div><span class="feature-title">原图 Base64 自动重组：</span><span class="feature-desc">精准捕获系统附带的高清 JPEG 图像帧，转译为标准 OpenAI 多模态格式。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-orange"></div>
+          <div><span class="feature-title">多模态旗舰自由指定：</span><span class="feature-desc">直通 GPT-4o、Claude 3.5 Sonnet、Gemini 1.5 Pro 进行深度看图推演。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-orange"></div>
+          <div><span class="feature-title">现实世界即看即答：</span><span class="feature-desc">支持拍照认物、复杂高数手写题拆解、街头小语种招牌同传翻译。</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 场景 4: 本地控制台 -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon-wrap icon-console">🎛️</div>
+            <div>
+              <div class="card-title">全客户端 Liquid Glass 本地控制台</div>
+              <div class="card-desc">手机 Safari 直开 sair.box · 拒绝繁琐改配置</div>
+            </div>
+          </div>
+          <div class="pill-trigger pill-green">Safari 访问 http://sair.box</div>
+        </div>
+
+        <div class="mockup-box">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="address-bar-mock">
+              <span>🔒 http://sair.box</span>
+              <span style="color: #64748B;">(Fake-IP 直达)</span>
+            </div>
+            <div class="model-chip-mock">
+              <span>● 探针 182ms</span>
+            </div>
+          </div>
+          <div class="chat-row" style="margin-top: 2px;">
+            <span class="chat-badge badge-model-console">已选模型</span>
+            <span style="font-family: monospace; font-size: 11.5px; color: #E2E8F0;">auto/gemini-3.8-flash</span>
+            <span style="color: #38BDF8; font-size: 11px; margin-left: auto;">[ 🔍 一键拉取所有模型 ]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-bullet bullet-green"></div>
+          <div><span class="feature-title">一键探测上游模型：</span><span class="feature-desc">点选“获取所有模型”自动读取上游可用列表，标签化即选即用，告别手动输入。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-green"></div>
+          <div><span class="feature-title">六大主流代理全覆盖：</span><span class="feature-desc">全面支持 Surge、Loon、Stash、Shadowrocket、Quantumult X、Egern。</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-bullet bullet-green"></div>
+          <div><span class="feature-title">隐私与安全性保障：</span><span class="feature-desc">纯本地存储，API Key 密文遮罩，任何密钥和对话绝不经过第三方服务器。</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部链路栏 -->
+  <div class="footer-pipeline">
+    <div class="flow-nodes">
+      <div class="flow-node">📱 系统原生入口 (Siri / 写作 / 相机)</div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-node highlight">⚡ SAIR 代理引擎 (sair.box 本地转译)</div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-node">🌐 任意上游 API (Claude / GPT / 本地模型)</div>
+    </div>
+    <div class="footer-meta">
+      <span class="meta-tag">GitHub: boitar/sair</span>
+      <div class="meta-divider"></div>
+      <span class="meta-tag">MIT License</span>
+    </div>
+  </div>
+
+</body>
+</html>

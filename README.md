@@ -54,6 +54,10 @@
 
 ## 核心特性
 
+<div align="center">
+  <img src="assets/scenarios.png" width="100%" alt="SAIR 场景全览与核心能力" />
+</div>
+
 | 能力 | 说明 |
 | :--- | :--- |
 | **三大原生场景** | 覆盖写作工具、Siri 语音/文本问答和视觉智能识图，并保留原生 UI 动效与交互。 |

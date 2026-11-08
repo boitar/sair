@@ -50,6 +50,10 @@ The native **Writing Tools**, **Siri QA**, and **Visual Intelligence** entry poi
 
 ## Key features
 
+<div align="center">
+  <img src="assets/scenarios.png" width="100%" alt="SAIR Core Scenarios Overview" />
+</div>
+
 | Capability | Description |
 | :--- | :--- |
 | **Three native scenarios** | Supports Writing Tools, Siri conversational QA, and Visual Intelligence while preserving the native UI flow. |
