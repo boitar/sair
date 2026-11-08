@@ -1236,7 +1236,7 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 
     <div class="footer-links">
       <p>持久化存储将覆盖模块默认参数 · 适用于全客户端<br />
-      本地地址：<a href="http://sair.box">http://sair.box</a> · <a href="http://sair.hub">http://sair.hub</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a></p>
+      本地地址：<a href="http://sair.box">http://sair.box</a> · <a href="http://sair.hub">http://sair.hub</a> · <a href="/sair/status?format=json" target="_blank">查看 JSON 状态</a> · <a href="https://github.com/boitar/sair" target="_blank">GitHub: boitar/sair</a> · <a href="https://linux.do" target="_blank" rel="noopener noreferrer">LINUX DO 社区</a></p>
     </div>
   </div>
 

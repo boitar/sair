@@ -13,6 +13,7 @@
 [![Egern](https://img.shields.io/badge/Egern-YAML%20Module-F59E0B?style=flat-square)](#手动安装-egern-模块)
 [![Protocol](https://img.shields.io/badge/API-OpenAI%20Compatible-10B981?style=flat-square)](#主流服务商配置示例)
 [![SSE](https://img.shields.io/badge/Stream-27--State%20SSE-EC4899?style=flat-square)](docs/protocol_analysis.md)
+[![LINUX DO](https://img.shields.io/badge/Community-LINUX%20DO-EA580C?style=flat-square&logo=linux&logoColor=white)](https://linux.do)
 [![License](https://img.shields.io/badge/License-MIT-64748B?style=flat-square)](LICENSE)
 
 <p align="center">
