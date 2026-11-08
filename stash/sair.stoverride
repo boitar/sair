@@ -1,7 +1,8 @@
-name: SAIR - Siri-ously AI Router
-desc: 国行 Apple 智能大模型重写覆写规则：通过 Stash 本地脚本重写，将写作工具、Siri 问答与视觉智能透明转接至自定义 OpenAI 兼容模型。安装后开启覆写，在 Safari 访问 http://sair.box 即可直达 Liquid Glass 控制台配置全部参数与人格设定。
-author: boitar
-homepage: https://github.com/boitar/sair
+name: "SAIR - Siri-ously AI Router"
+desc: "国行 Apple 智能大模型重写覆写规则：通过 Stash 本地脚本重写，将写作工具、Siri 问答与视觉智能透明转接至自定义 OpenAI 兼容模型。安装后开启覆写，在 Safari 访问 http://sair.box 即可直达控制台配置全部参数与人格设定。"
+openUrl: "http://sair.box"
+author: "boitar"
+homepage: "https://github.com/boitar/sair"
 
 hosts:
   sair.box: 198.18.41.218
@@ -18,42 +19,49 @@ rules:
 
 http:
   force-http-engine:
+    - "sair.box:80"
+    - "sair.hub:80"
+    - "sair.ai:80"
+    - "*.sair.box:80"
+    - "*.sair.hub:80"
+    - "*.sair.ai:80"
+    - "198.18.41.218:80"
+    - "198.18.41.219:80"
+    - "198.18.41.220:80"
+  mitm:
+    - "prod-yabuli.qianwen.com"
     - "sair.box"
     - "*.sair.box"
     - "sair.hub"
     - "*.sair.hub"
     - "sair.ai"
     - "*.sair.ai"
+  script:
+    - match: '^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$'
+      name: SAIR Dashboard
+      type: request
+      require-body: false
+      timeout: 15
+    - match: '^https:\/\/prod-yabuli\.qianwen\.com\/.*'
+      name: SAIR Request
+      type: request
+      require-body: true
+      max-size: 16777216
+      timeout: 60
+    - match: '^https:\/\/prod-yabuli\.qianwen\.com\/.*'
+      name: SAIR Response
+      type: response
+      require-body: true
+      max-size: 16777216
+      timeout: 60
 
-mitm:
-  - "prod-yabuli.qianwen.com"
-  - "sair.box"
-  - "*.sair.box"
-  - "sair.hub"
-  - "*.sair.hub"
-  - "sair.ai"
-  - "*.sair.ai"
-
-script:
-  - name: SAIR Dashboard
-    match: ^https?:\/\/(sair\.(box|hub|ai|local)|127\.0\.0\.1(:[0-9]+)?\/sair|localhost(:[0-9]+)?\/sair|prod-yabuli\.qianwen\.com\/sair)(?:[/?].*)?$
-    type: request
-    require-body: false
-    timeout: 15
-    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-
-  - name: SAIR Request
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
-    type: request
-    require-body: true
-    max-size: 16777216
-    timeout: 60
-    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
-
-  - name: SAIR Response
-    match: ^https:\/\/prod-yabuli\.qianwen\.com\/.*
-    type: response
-    require-body: true
-    max-size: 16777216
-    timeout: 60
-    script-path: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+script-providers:
+  SAIR Dashboard:
+    url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    interval: 86400
+  SAIR Request:
+    url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    interval: 86400
+  SAIR Response:
+    url: https://raw.githubusercontent.com/boitar/sair/main/scripts/sair_adapter.js
+    interval: 86400
