@@ -1557,6 +1557,31 @@ function renderWebConfigDashboard(config, clientRuntime, updateNotice) {
 // 3. Request Extraction: Prompt & Multimodal Image Detection
 // =========================================================================
 
+function stripSiriTriggerWords(text) {
+  if (!text || typeof text !== "string") return text;
+  let str = text.trim();
+
+  // 1. Chinese invocation prefix:
+  // e.g. 问问千问、问一下千问、帮我问问千问、向千问提问、让千问回答、问千问
+  const cnPrefix = /^(?:(?:请|帮我|麻烦)?(?:问问|问一下|问下|问|叫|让)(?:通义)?千问(?:帮我|一下|下|说|回答)?|(?:请|帮我|麻烦)?向(?:通义)?千问(?:提问|请教)?)[，,：:\s	]*/i;
+  str = str.replace(cnPrefix, "").trim();
+
+  // 2. English invocation prefix: e.g. "Ask Qwen, ...", "Ask Tongyi Qwen: ..."
+  const enPrefix = /^(?:please\s+)?(?:ask|query)\s+(?:tongyi\s+)?qwen(?:[,\s:]+)/i;
+  str = str.replace(enPrefix, "").trim();
+
+  // 3. Chinese invocation suffix: e.g. "..., 问问千问", "..., 帮我问一下千问"
+  const cnSuffix = /[，,：:\s\t]+(?:(?:请|帮我|麻烦)?(?:问问|问一下|问下|问)(?:通义)?千问(?:帮我|一下|下)?)$/i;
+  str = str.replace(cnSuffix, "").trim();
+
+  // 4. Fallback if the user ONLY said the trigger word (e.g. "问问千问")
+  if (!str) {
+    return "你好";
+  }
+
+  return str;
+}
+
 function extractPromptAndImage(reqBody) {
   let prompt = "";
   let imageUrl = "";
@@ -1661,6 +1686,10 @@ function extractPromptAndImage(reqBody) {
         prompt = matches.map(m => m[1]).join("\n\n");
       }
     }
+  }
+
+  if (prompt && (scenario === "siri" || scenario === "general")) {
+    prompt = stripSiriTriggerWords(prompt);
   }
 
   return { prompt: prompt.trim(), imageUrl, scenario };
@@ -1875,6 +1904,10 @@ function replaceStreamText(originalSseBody, replyText, userPrompt, scenario) {
       imageUrl = cachedImage;
       scenario = cachedScenario;
     }
+  }
+
+  if (prompt && (scenario === "siri" || scenario === "general")) {
+    prompt = stripSiriTriggerWords(prompt);
   }
 
   // Adaptive Timeout calculation based on scenario
